@@ -59,3 +59,7 @@ ruff = "^0.5"
 
 [tool.poetry.group.typing.dependencies]
 mypy = "^1.10"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.4.3,<8.0.0"
+pytest-socket = "^0.7.0"

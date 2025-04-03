@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuronline - Onboarding</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('chat', () => ({
+                messages: [],
+                wsStatus: 'disconnected',
+                isTyping: false,
+                userInput: '',
+                ws: null,
+
+                init() {
+                    this.connectWebSocket();
+                },
+
+                connectWebSocket() {
+                    try {
+                        this.ws = new WebSocket('ws://localhost:3000/ws');
+
+                        this.ws.onopen = () => {
+                            console.log('WebSocket connected');
+                            this.wsStatus = 'connected';
+                            this.addSystemMessage('Соединение установлено');
+
+                            // Send welcome message
+                            this.ws.send(JSON.stringify({
+                                type: 'welcome',
+                                content: 'Start onboarding'
+                            }));
+                        };
+
+                        this.ws.onmessage = (event) => {
+                            const data = JSON.parse(event.data);
+                            console.log('Received:', data);
+
+                            if (data.type === 'message') {
+                                this.addBotMessage(data.content);
+                            } else if (data.type === 'error') {
+                                this.addSystemMessage('Ошибка: ' + data.content);
+                            }
+                        };
+
+                        this.ws.onclose = () => {
+                            console.log('WebSocket closed');
+                            this.wsStatus = 'disconnected';
+                            this.addSystemMessage('Соединение прервано');
+                        };
+
+                        this.ws.onerror = (error) => {
+                            console.error('WebSocket error:', error);
+                            this.wsStatus = 'error';
+                            this.addSystemMessage('Ошибка соединения');
+                        };
+                    } catch (error) {
+                        console.error('WebSocket connection error:', error);
+                        this.addSystemMessage('Ошибка при подключении');
+                    }
+                },
+
+                sendMessage() {
+                    if (!this.userInput.trim()) return;
+
+                    const message = {
+                        type: 'message',
+                        content: this.userInput
+                    };
+
+                    this.addUserMessage(this.userInput);
+                    this.userInput = '';
+
+                    try {
+                        this.ws.send(JSON.stringify(message));
+                        this.isTyping = true;
+                    } catch (error) {
+                        console.error('Error sending message:', error);
+                        this.addSystemMessage('Ошибка при отправке сообщения');
+                    }
+                },
+
+                addUserMessage(content) {
+                    this.messages.push({
+                        type: 'user',
+                        content: content
+                    });
+                    this.scrollToBottom();
+                },
+
+                addBotMessage(content) {
+                    this.isTyping = false;
+                    this.messages.push({
+                        type: 'bot',
+                        content: content
+                    });
+                    this.scrollToBottom();
+                },
+
+                addSystemMessage(content) {
+                    this.messages.push({
+                        type: 'system',
+                        content: content
+                    });
+                    this.scrollToBottom();
+                },
+
+                scrollToBottom() {
+                    setTimeout(() => {
+                        const chatContainer = document.querySelector('#chat-container');
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }, 100);
+                }
+            }));
+        });
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#B7F501', // Neon green
+                        background: '#0F0F0F', // Near black
+                        surface: '#1A1A1A', // Dark gray
+                        surfaceLight: '#2A2A2A', // Lighter dark gray
+                        textPrimary: '#FFFFFF', // White
+                        textSecondary: '#A0A0A0', // Light gray
+                        accent1: '#00D1FF', // Cyan
+                        accent2: '#FF00E5', // Magenta
+                        accent3: '#FF9500', // Orange
+                        success: '#00C853', // Green
+                        warning: '#FFD600', // Yellow
+                        error: '#FF5252', // Red
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-in': 'slideIn 0.5s ease-out forwards',
+                        'slide-out': 'slideOut 0.5s ease-in forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'fade-out': 'fadeOut 0.3s ease-in forwards',
+                        'scale-in': 'scaleIn 0.3s ease-out forwards',
+                        'bounce-in': 'bounceIn 0.5s ease-out forwards',
+                        'typing': 'typing 1.5s steps(30, end)',
+                        'blink-caret': 'blink-caret 0.75s step-end infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: 0 },
+                            '100%': { transform: 'translateX(0)', opacity: 1 },
+                        },
+                        slideOut: {
+                            '0%': { transform: 'translateX(0)', opacity: 1 },
+                            '100%': { transform: 'translateX(-100%)', opacity: 0 },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 },
+                        },
+                        fadeOut: {
+                            '0%': { opacity: 1 },
+                            '100%': { opacity: 0 },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: 0 },
+                            '100%': { transform: 'scale(1)', opacity: 1 },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: 0 },
+                            '50%': { transform: 'scale(1.05)', opacity: 0.8 },
+                            '70%': { transform: 'scale(0.9)', opacity: 0.9 },
+                            '100%': { transform: 'scale(1)', opacity: 1 },
+                        },
+                        typing: {
+                            '0%': { width: '0' },
+                            '100%': { width: '100%' }
+                        },
+                        'blink-caret': {
+                            '0%, 100%': { borderColor: 'transparent' },
+                            '50%': { borderColor: '#B7F501' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        .bg-blur {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .brain-bg {
+            background: radial-gradient(circle at center, rgba(183, 245, 1, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+        }
+
+        .stars {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+            box-shadow: 1744px 122px #fff, 134px 1321px #fff, 92px 859px #fff, 235px 1045px #fff, 366px 912px #fff, 491px 942px #fff, 14px 1831px #fff, 582px 476px #fff, 588px 1230px #fff, 1520px 1343px #fff, 1671px 203px #fff, 550px 341px #fff, 1491px 549px #fff, 558px 161px #fff, 896px 1823px #fff, 999px 1463px #fff, 1557px 636px #fff, 1754px 1307px #fff, 178px 1489px #fff, 1482px 571px #fff, 1123px 1831px #fff, 1377px 1331px #fff, 2000px 1665px #fff, 145px 1530px #fff, 1338px 1732px #fff, 1372px 735px #fff, 1658px 1139px #fff, 578px 1914px #fff, 1096px 1951px #fff, 643px 1562px #fff, 1633px 1257px #fff, 1133px 1952px #fff, 1538px 1155px #fff, 1108px 1042px #fff, 1281px 1822px #fff, 966px 1746px #fff, 934px 938px #fff, 1438px 1186px #fff, 355px 1542px #fff, 1845px 178px #fff, 837px 1753px #fff, 373px 1877px #fff, 1544px 1705px #fff, 106px 1308px #fff, 1334px 1277px #fff, 1611px 1599px #fff, 1212px 537px #fff, 214px 582px #fff, 1857px 1074px #fff, 1707px 1812px #fff;
+            animation: animStar 50s linear infinite;
+        }
+
+        @keyframes animStar {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-2000px); }
+        }
+
+        /* Chat bubble styles */
+        .chat-bubble {
+            position: relative;
+            border-radius: 1.5rem;
+        }
+
+        .chat-bubble.bot::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -0.75rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background: #2A2A2A;
+            border-bottom-right-radius: 1.5rem;
+            border-top-left-radius: 0.5rem;
+            clip-path: polygon(0 0, 100% 100%, 100% 0);
+        }
+
+        .chat-bubble.user::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -0.75rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background: #B7F501;
+            border-bottom-left-radius: 1.5rem;
+            border-top-right-radius: 0.5rem;
+            clip-path: polygon(0 100%, 0 0, 100% 0);
+        }
+
+        /* Typing animation */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            border-radius: 50%;
+            background-color: #B7F501;
+            animation: typing-dot 1.4s infinite both;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing-dot {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-4px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-background text-textPrimary min-h-screen">
+
+    <div class="stars"></div>
+
+    <div class="container mx-auto px-4 py-8 relative z-10" x-data="chat">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">
+                <span class="text-primary">Neuro</span>nline
+            </h1>
+            <p class="text-textSecondary">Персональный ассистент для нейрофитнеса</p>
+        </header>
+
+        <!-- Connection Status -->
+        <div class="text-center mb-4">
+            <span x-show="wsStatus === 'connected'" class="inline-flex items-center px-3 py-1 rounded-full bg-success/20 text-success">
+                <span class="w-2 h-2 rounded-full bg-success mr-2"></span>
+                Подключено
+            </span>
+            <span x-show="wsStatus === 'disconnected'" class="inline-flex items-center px-3 py-1 rounded-full bg-error/20 text-error">
+                <span class="w-2 h-2 rounded-full bg-error mr-2"></span>
+                Отключено
+            </span>
+            <span x-show="wsStatus === 'error'" class="inline-flex items-center px-3 py-1 rounded-full bg-warning/20 text-warning">
+                <span class="w-2 h-2 rounded-full bg-warning mr-2"></span>
+                Ошибка соединения
+            </span>
+        </div>
+
+        <!-- Chat Container -->
+        <div id="chat-container" class="bg-surface rounded-lg p-4 mb-4 h-[60vh] overflow-y-auto">
+            <template x-for="(message, index) in messages" :key="index">
+                <div :class="{
+                    'flex': true,
+                    'justify-end': message.type === 'user',
+                    'justify-start': message.type !== 'user',
+                    'mb-4': true
+                }">
+                    <div :class="{
+                        'chat-bubble max-w-[80%] p-4': true,
+                        'bg-primary text-background': message.type === 'user',
+                        'bg-surfaceLight': message.type === 'bot',
+                        'bg-warning/20 text-warning text-sm': message.type === 'system'
+                    }">
+                        <p x-text="message.content"></p>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Typing Indicator -->
+            <div x-show="isTyping" class="flex justify-start mb-4">
+                <div class="chat-bubble bg-surfaceLight p-4">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex gap-4">
+            <input
+                type="text"
+                x-model="userInput"
+                @keyup.enter="sendMessage"
+                placeholder="Введите сообщение..."
+                class="flex-1 bg-surfaceLight rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+            <button
+                @click="sendMessage"
+                class="bg-primary text-background px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+            >
+                Отправить
+            </button>
+        </div>
+    </div>
+</body>
+</html>

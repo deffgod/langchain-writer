@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+
+<body>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Нейрофитнес План</title>
+
+	<style>
+		:root {
+			--background: #000;
+			--card-bg: #242424;
+			--text-primary: #ffffff;
+			--text-secondary: #8a8a8a;
+			--accent: #b4ff00;
+			--hover-bg: #2d2d2d;
+		}
+
+		body {
+			background: var(--background);
+			color: var(--text-primary);
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			margin: 0;
+			padding: 20px;
+		}
+
+
+		.schedule-container {
+			max-width: 800px;
+			margin: 0 auto;
+		}
+
+		.week-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+
+		.week-title {
+			font-size: 1.7rem;
+			font-weight: 600;
+		}
+
+		.week-info {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			color: var(--text-secondary);
+		}
+
+		.completion {
+			color: var(--accent);
+		}
+
+		.days-grid {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+			gap: 10px;
+			margin-bottom: 30px;
+		}
+
+		.day-button {
+			background: var(--card-bg);
+			border: none;
+			color: var(--text-primary);
+			padding: 15px;
+			border-radius: 12px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-size: 20px;
+		}
+
+		.day-button.active {
+			background: var(--accent);
+			color: var(--background);
+			font-weight: 600;
+		}
+
+		.workout-list {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+		}
+
+		.workout-card {
+			background: var(--card-bg);
+			border-radius: 16px;
+			padding: 20px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			transition: all 0.3s ease;
+			border: 0.4px solid #8a8a8a
+		}
+
+		.workout-card:hover {
+			background: var(--hover-bg);
+			transform: translateX(5px);
+		}
+
+		.workout-info {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		.workout-title {
+			font-size: 1.3rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.workout-details {
+			display: flex;
+			gap: 19px;
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+		}
+
+		.workout-badge {
+			background: rgba(74, 222, 128, 0.1);
+			color: var(--accent);
+			padding: 5px 12px;
+			border-radius: 20px;
+			font-size: 0.9rem;
+		}
+
+		.date-header {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 20px;
+			color: var(--accent);
+			font-size: 1.5rem;
+			font-weight: 600;
+		}
+
+		.workout-icon {
+			width: 24px;
+			height: 24px;
+			fill: var(--accent);
+			margin-right: 10px;
+		}
+
+		@media (max-width: 768px) {
+			.days-grid {
+				grid-template-columns: repeat(0, 1fr);
+			}
+
+			.workout-card {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 30px;
+			}
+		}
+	</style>
+	<script>
+		tailwind.config = {
+			theme: {
+				extend: {
+            		/* Main Container Styles */
+.container {
+			@apply classm - 0 p - 0 box - border tap - highlight - transparent bg - [212122] text - white min - h - screen px - 5 py - [calc(20pxenv(safe - area - inset - top))] pb - [calc(20pxenv(safe - area - inset - bottom))] max - w - full mx - auto flex gap - 2;
+		}
+
+
+/* Grid Styles */
+.grid {
+			@apply classgrid grid - cols - 2 gap - 3;
+		}
+
+
+/* Card Styles */
+.card {
+			@apply classbg - white / 10 backdrop - blur - [20px] rounded - [16px] p - 4 flex flex - col transition - transform duration - 300 ease - [cubic - bezier(0.4, 0, 0.2, 1)] transform active: scale - 95;
+		}
+
+
+/* Title Styles */
+.title {
+			@apply classtext - [32px] font - semibold text - [6FFF00] mb - 1;
+		}
+
+
+/* Subtitle Styles */
+.subtitle {
+			@apply classtext - [16px] text - white / 60;
+		}
+
+
+/* Image Styles */
+.image {
+			@apply classbg - white / 5 rounded - [20px] overflow - hidden transition - transform duration - 300 ease - [cubic - bezier(0.4, 0, 0.2, 1)] active: scale - 95 w - full h - [200px] object - cover rounded - [16px];
+		}
+
+
+/* Padding Styles */
+.padding {
+			@apply classp - 4;
+		}
+
+
+/* Section Title Styles */
+.section - title {
+			@apply classtext - [20px] font - semibold mb - 2;
+		}
+
+
+/* Flex Container Styles */
+.flex - container {
+			@apply classflex gap - 4 text - [14px] text - white / 60;
+		}
+
+
+/* Flex Item Styles */
+.flex - item {
+			@apply classflex items - center gap - 1;
+		}
+
+
+/* Progress Bar Styles */
+.progress - bar {
+			@apply classabsolute bottom - 0 left - 0 right - 0 h - [3px] bg - white / 10 overflow - hidden;
+		}
+
+
+.progress - fill {
+			@apply classh - full bg - [6FFF00] transition - width duration - 300 ease;
+		}
+
+
+/* Scrollable Container Styles */
+.scrollable {
+			@apply classoverflow - hidden touch - pan - y touch - pinch - zoom;
+		}
+
+
+/* Hidden Element Styles */
+.hidden {
+			@apply classhidden;
+		}
+
+
+/* Gradient Text Styles */
+.gradient - text {
+			@apply classbg - gradient - to - r from - white to - [b4ff00] bg - clip - text text - transparent;
+		}
+
+
+/* Background Styles */
+.background {
+			@apply classbg - [2c2c2e] rounded - [12px] overflow - hidden;
+		}
+
+
+.background - highlight {
+			@apply classbg - [b4ff00] h - full transition - width duration - 500 ease;
+		}
+
+
+.background - dark {
+			@apply classbg - [1c1c1e] rounded - [16px] transition - transform duration - 300 ease;
+		}
+
+
+/* Scrollable Card Styles */
+.scrollable - card {
+			@apply classflex flex - row overflow - x - auto overflow - y - auto rounded - tl - [0.75rem] rounded - tr - [0.75rem] rounded - br - [0.75rem] rounded - bl - [0.75rem] border - t border - t - [0a0a0a] / 90 border - r border - r - [0a0a0a] / 90 border - b border - b - [0a0a0a] / 90 border - l border - l - [0a0a0a] / 90 bg - [1c1c1e] rounded - [16px] transition - transform duration - 300 ease shadow - [0px5px35pxrgba(10, 10, 10, 0.9)] p - 4 h - auto backdrop - blur - [30px] hover: translate - y - [-4px];
+		}
+
+
+/* Modal Styles */
+.modal {
+			@apply classfixed top - 0 left - 0 w - screen h - screen bg - [000000] z - 50 flex items - center justify - center;
+		}
+
+
+/* Animation Styles */
+.animate - pulse {
+			@apply classanimate - pulse;
+		}
+
+
+/* Fade In Styles */
+.fade -in {
+    @apply classopacity - 0 translate - y - [20px] classopacity - 100 translate - y - 0 transition - opacity transition - transform duration - 300;
+}
+
+
+/* Layout Styles */
+.layout {
+			@apply classmax - w - [800px] mx - auto;
+		}
+
+
+/* Header Styles */
+.header {
+			@apply classflex justify - between items - center mb - 5;
+		}
+
+
+.header - title {
+			@apply classtext - [1.7rem] font - semibold;
+		}
+
+
+/* Secondary Text Styles */
+.secondary - text {
+			@apply classflex items - center gap - 4 text - [86868b];
+		}
+
+
+.secondary - title {
+			@apply classtext - [2c2c2e];
+		}
+
+
+/* Grid Layout Styles */
+.grid - layout {
+			@apply classgrid grid - cols - 7 gap - 2 mb - 7;
+		}
+
+
+/* Button Styles */
+.button {
+			@apply classbg - [1c1c1e] border - none text - white p - 4 rounded - [12px] cursor - pointer transition - all duration - 300 text - [20px];
+		}
+
+
+.button - highlight {
+			@apply classbg - [2c2c2e] text - [ffffff] font - semibold;
+		}
+
+
+/* Card Flex Styles */
+.card - flex {
+			@apply classflex flex - col gap - 4 bg - [1c1c1e] rounded - [16px] p - 5 justify - between items - center transition - all duration - 300 border border - [8a8a8a];
+		}
+
+
+.card - flex - row {
+			@apply classbg - [1c1c1e] rounded - [16px] p - 5 flex justify - between items - center transition - all duration - 300 border border - [8a8a8a];
+		}
+
+
+/* Hover Effects */
+.hover - effect {
+			@apply classhover: bg - [2c2c2e] transform translate - x - 1;
+		}
+
+
+/* Flex Column Styles */
+.flex - column {
+			@apply classflex flex - col gap - 1;
+		}
+
+
+/* Small Title Styles */
+.small - title {
+			@apply classtext - [2c2c2e] text - [1.3rem] font - semibold;
+		}
+
+
+/* Small Text Styles */
+.small - text {
+			@apply classflex gap - 5 text - [86868b] text - [0.9rem];
+		}
+
+
+/* Badge Styles */
+.badge {
+			@apply classbg - [4ade80] / 10 text - [2c2c2e] p - 1 rounded - [20px] text - [0.9rem];
+		}
+
+
+/* Icon Styles */
+.icon {
+			@apply classflex items - center gap - 2 mb - 5 text - [2c2c2e] text - [1.5rem] font - semibold;
+		}
+
+
+.icon - size {
+			@apply classw - 6 h - 6 fill - [2c2c2e] mr - 2;
+		}
+
+
+/* Responsive Grid Styles */
+.responsive - grid {
+			@apply classgrid grid - cols - 1 md: grid - cols - 7 gap - 2;
+		}
+
+
+/* Flex Column Alignment */
+.flex - column - align {
+			@apply classflex flex - col items - start gap - 7;
+		}
+
+		colors: {
+			'neon-green': '#b4ff00',
+				'dark-bg': '#1f1f1f',
+					'card-bg': '#1c1c1e',
+						'accent-bg': '#2c2c2e'
+		}
+            }
+        }
+    };
+	</script>
+	<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+	<div class="schedule-container">
+		<div class="week-header">
+			<div class="week-title">Неделя {{week.index}}</div>
+			<div class="week-info">
+				<span>Прогресс дня</span>
+				<span class="completion">100%</span>
+			</div>
+		</div>
+		<div class="days-grid">
+			<button class="day-button active">1</button>
+			<button class="day-button">2</button>
+			<button class="day-button">3</button>
+			<button class="day-button">4</button>
+			<button class="day-button">5</button>
+			<button class="day-button">6</button>
+			<button class="day-button">7</button>
+		</div>
+		<div class="date-header">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+				<line x1="16" y1="2" x2="16" y2="6"></line>
+				<line x1="8" y1="2" x2="8" y2="6"></line>
+				<line x1="3" y1="10" x2="21" y2="10"></line>
+			</svg>
+			Пн, 30 Декабрь
+		</div>
+		<div class="workout-list">
+			<div class="workout-card">
+				<div class="workout-info">
+					<div class="workout-title">
+						<svg class="workout-icon" viewBox="0 0 24 24">
+							<path
+								d="M7 3C5.9 3 5 3.9 5 5V9C5 10.1 5.9 11 7 11H9C10.1 11 11 10.1 11 9V5C11 3.9 10.1 3 9 3H7M17 3C15.9 3 15 3.9 15 5V9C15 10.1 15.9 11 17 11H19C20.1 11 21 10.1 21 9V5C21 3.9 20.1 3 19 3H17M7 13C5.9 13 5 13.9 5 15V19C5 20.1 5.9 21 7 21H9C10.1 21 11 20.1 11 19V15C11 13.9 10.1 13 9 13H7M17 13C15.9 13 15 13.9 15 15V19C15 20.1 15.9 21 17 21H19C20.1 21 21 20.1 21 19V15C21 13.9 20.1 13 19 13H17Z">
+							</path>
+						</svg>
+						Нейрозарядка
+					</div>
+					<div class="workout-details">
+						<span>{{hh:mm}}</span>
+						<span>{{workout1}}</span>
+					</div>
+				</div>
+				<div class="workout-badge">Утро</div>
+			</div>
+			<div class="workout-card">
+				<div class="workout-info">
+					<div class="workout-title">
+						<svg class="workout-icon" viewBox="0 0 24 24">
+							<path
+								d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z">
+							</path>
+						</svg>
+						Основная
+					</div>
+					<div class="workout-details">
+						<span>{{hh:mm}}</span>
+						<span>{{workout2}}</span>
+					</div>
+				</div>
+				<div class="workout-badge">День</div>
+			</div>
+			<div class="workout-card">
+				<div class="workout-info">
+					<div class="workout-title">
+						<svg class="workout-icon" viewBox="0 0 24 24">
+							<path
+								d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M7,16H17V22H7V16Z">
+							</path>
+						</svg>
+						Дополнительная
+					</div>
+					<div class="workout-details">
+						<span>{{hh:mm}}</span>
+						<span>{{workout3}}</span>
+					</div>
+				</div>
+				<div class="workout-badge">Вечер</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</body>
+
+</html>

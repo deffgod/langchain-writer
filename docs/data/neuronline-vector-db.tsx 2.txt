@@ -1,0 +1,494 @@
+import React, { useState } from 'react';
+import { Search, FileText, Database, Code, Layout, Server, Activity, Book, Settings } from 'lucide-react';
+
+const NeuronlineVectorDB = () => {
+  const [activeCategory, setActiveCategory] = useState('overview');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  // Vector database structure with embedded knowledge from the docs
+  const vectorDB = {
+    overview: {
+      title: 'System Overview',
+      items: [
+        {
+          id: 'overview-1',
+          title: 'Purpose',
+          content: 'The Neuronline Platform is a comprehensive fitness and cognitive training application that uniquely combines personalized neurofitness programs with traditional workout methodologies. It leverages neuroscience principles, AI-driven analysis, and real-time user feedback to deliver tailored training plans.',
+          keywords: ['neurofitness', 'cognitive training', 'personalized', 'AI-driven', 'neuroscience']
+        },
+        {
+          id: 'overview-2',
+          title: 'Target Users',
+          content: 'Individuals seeking personalized fitness routines, users interested in improving cognitive performance alongside physical fitness, health-conscious professionals looking for efficient workouts, people recovering from injuries, and fitness enthusiasts interested in neurological aspects of performance.',
+          keywords: ['target audience', 'users', 'fitness enthusiasts', 'cognitive performance', 'recovery']
+        },
+        {
+          id: 'overview-3',
+          title: 'Key Features',
+          content: 'User Registration, Neurotesting and Cognitive Assessment, AI-Generated Personalized Fitness Plans, Adaptive Workout Scheduling, Real-Time Progress Tracking, Video-Based Exercise Instruction, Integrated Cognitive Training, and Motivational Feedback System.',
+          keywords: ['features', 'registration', 'neurotesting', 'personalized plans', 'progress tracking']
+        },
+        {
+          id: 'overview-4',
+          title: 'Neural-Physical Integration',
+          content: 'The system balances neurological and physical training through various components including Vestibular System Training (balance and spatial awareness), Visual System Training (visual processing and eye movement), Cognitive-Motor Integration (brain-body coordination), and Physical Conditioning.',
+          keywords: ['neural-physical', 'vestibular', 'visual system', 'cognitive-motor', 'integration']
+        }
+      ]
+    },
+    architecture: {
+      title: 'System Architecture',
+      items: [
+        {
+          id: 'arch-1',
+          title: 'High-Level Architecture',
+          content: 'A modern, modular architecture with User Interaction (Next.js Frontend, Mobile UI), External Services (Kinescope.io, Writer.com), API Layer (RESTful APIs, Auth Services), AI & Analysis (Neural Analysis Engine, Personalization Algorithms), and Data Layer (PostgreSQL DB, Supabase).',
+          keywords: ['architecture', 'modular', 'Next.js', 'RESTful', 'PostgreSQL', 'Supabase']
+        },
+        {
+          id: 'arch-2',
+          title: 'Technology Stack',
+          content: 'Frontend: Next.js, React, Tailwind CSS, Framer Motion, ShadcN UI. Backend: Next.js API routes, Supabase, PostgreSQL. External: Kinescope.io Player API, Writer.com AI API, OpenAI/Anthropic AI. DevOps: Vercel, GitHub Actions, Docker, monitoring tools.',
+          keywords: ['tech stack', 'frontend', 'backend', 'external services', 'devops', 'monitoring']
+        },
+        {
+          id: 'arch-3',
+          title: 'Frontend Layer',
+          content: 'User interface components, client-side state management, and form validation and data submission using Next.js.',
+          keywords: ['frontend', 'UI components', 'state management', 'form validation']
+        },
+        {
+          id: 'arch-4',
+          title: 'Backend Layer',
+          content: 'Authentication and authorization, business logic for plan generation, and data processing and analysis through Next.js API Routes and external services.',
+          keywords: ['backend', 'authentication', 'business logic', 'data processing']
+        },
+        {
+          id: 'arch-5',
+          title: 'Database Layer',
+          content: 'User data storage, training plan storage, and progress metrics using PostgreSQL via Supabase.',
+          keywords: ['database', 'data storage', 'PostgreSQL', 'Supabase']
+        }
+      ]
+    },
+    database: {
+      title: 'Database Schema',
+      items: [
+        {
+          id: 'db-1',
+          title: 'Users Table',
+          content: 'Stores user information including UserID, Email, FullName, FirstName, LastName, Gender, Age, Weight, Height, health metrics, FitnessIndex, CalorieIntake, and timestamps.',
+          keywords: ['users', 'user profile', 'demographics', 'health metrics']
+        },
+        {
+          id: 'db-2',
+          title: 'Neurotesting Results',
+          content: 'Stores TestID, UserID (FK), BalanceScore, CoordinationScore, VisionAcuity, ReactionTime, MemoryScore, and TestedAt timestamp.',
+          keywords: ['neurotesting', 'cognitive assessment', 'balance', 'coordination', 'reaction time']
+        },
+        {
+          id: 'db-3',
+          title: 'Fitness Goals',
+          content: 'Stores GoalID, UserID (FK), arrays for PrimaryGoal and SecondaryGoal, and CreatedAt timestamp.',
+          keywords: ['fitness goals', 'objectives', 'user preferences']
+        },
+        {
+          id: 'db-4',
+          title: 'Workout Plans',
+          content: 'Stores PlanID, UserID (FK), PlanTitle, DurationWeeks, TrainingDays, DailyDuration, and CreatedAt timestamp.',
+          keywords: ['workout plans', 'training schedule', 'exercise program']
+        },
+        {
+          id: 'db-5',
+          title: 'Weekly Workouts',
+          content: 'Stores WorkoutID, PlanID (FK), WeekNumber, DayOfWeek, WorkoutType, WorkoutName, Duration, Intensity, FocusArea, Equipment, Effects (JSONB), and CreatedAt timestamp.',
+          keywords: ['weekly workouts', 'exercise schedule', 'workout details']
+        },
+        {
+          id: 'db-6',
+          title: 'Progress Tracking',
+          content: 'Stores ProgressID, UserID (FK), PlanID (FK), Date, CompletedExercises, Duration, CaloriesBurned, Rating, Feedback, and CreatedAt timestamp.',
+          keywords: ['progress tracking', 'workout completion', 'performance metrics']
+        },
+        {
+          id: 'db-7',
+          title: 'Videos',
+          content: 'Stores video metadata including id, project_id, folder_id, player_id, title, subtitle, description, status, progress, duration, created_at, updated_at.',
+          keywords: ['videos', 'training content', 'exercise instruction']
+        }
+      ]
+    },
+    components: {
+      title: 'Application Components',
+      items: [
+        {
+          id: 'comp-1',
+          title: 'Component Organization',
+          content: 'Components are organized by feature and functionality: features/ (feature-specific components like achievements, workouts, neuro), layout/ (layout components), ui/ (reusable UI components), common/ (common components), providers/ (context providers), and video/ (video-related components).',
+          keywords: ['components', 'organization', 'structure', 'features', 'layout']
+        },
+        {
+          id: 'comp-2',
+          title: 'Feature Components',
+          content: 'Feature-specific components include achievements/ (AchievementBadges, AchievementGrid), workouts/ (WorkoutCard, WorkoutDetails), neuro/ (NeuralTestResults, Neurotest), activity/ (ActivityChart, ActivityDashboard), fitness/ (FitnessGoals, TrainingPlan), and shop/ (ShopGrid).',
+          keywords: ['feature components', 'achievements', 'workouts', 'neuro', 'activity', 'fitness']
+        },
+        {
+          id: 'comp-3',
+          title: 'UI Components',
+          content: 'Reusable UI components categorized into data-display/ (accordion, avatar, badge), inputs/ (button, checkbox, form), feedback/ (alert, progress, spinner), overlay/ (dialog, drawer, modal), navigation/ (breadcrumb, menubar, tabs), and utils/ (error-boundary, portal, providers).',
+          keywords: ['UI components', 'data display', 'inputs', 'feedback', 'overlay', 'navigation']
+        },
+        {
+          id: 'comp-4',
+          title: 'Layout Components',
+          content: 'Layout components include navigation/ (DashboardNav, MainNav, UserNav, TapBarMenu) and general layout components (DashboardHeader, DashboardShell, Header, RootLayoutClient, Sidebar, BottomNavBar).',
+          keywords: ['layout components', 'navigation', 'header', 'dashboard', 'sidebar']
+        },
+        {
+          id: 'comp-5',
+          title: 'Dashboard Component',
+          content: 'The Dashboard component serves as the main interface for users after login, providing an overview of their fitness plan, progress, and upcoming workouts. It includes cards for Fitness Overview, Progress, and Upcoming Workouts.',
+          keywords: ['dashboard', 'overview', 'progress', 'upcoming workouts']
+        },
+        {
+          id: 'comp-6',
+          title: 'Workout Video Player',
+          content: 'The Workout Video Player component handles the playback of workout videos, tracking user progress and engagement. It includes video controls, progress tracking, and completion detection.',
+          keywords: ['video player', 'workout videos', 'progress tracking', 'completion']
+        },
+        {
+          id: 'comp-7',
+          title: 'Plan Generator',
+          content: 'The Plan Generator component interfaces with the AI system to generate personalized fitness plans based on user data and neurotesting results. It includes options for plan duration and intensity.',
+          keywords: ['plan generator', 'personalized plans', 'AI interface', 'fitness plans']
+        }
+      ]
+    },
+    api: {
+      title: 'API Reference',
+      items: [
+        {
+          id: 'api-1',
+          title: 'User Management Endpoints',
+          content: 'GET /users - Fetch all users, GET /users/{email} - Fetch specific user, POST /users - Create new user, PUT /users/{email} - Update user details, DELETE /users/{email} - Remove user.',
+          keywords: ['API', 'user management', 'CRUD', 'endpoints']
+        },
+        {
+          id: 'api-2',
+          title: 'Plan Management Endpoints',
+          content: 'GET /plans - Fetch all fitness plans, GET /plans/{planID} - Retrieve plan by ID, POST /plans - Create new plan, PUT /plans/{planID} - Update existing plan, DELETE /plans/{planID} - Delete plan.',
+          keywords: ['API', 'plan management', 'fitness plans', 'endpoints']
+        },
+        {
+          id: 'api-3',
+          title: 'Workout Management Endpoints',
+          content: 'GET /workouts/{planID}/{weekNumber}/{day} - Fetch workouts for specific day, POST /workouts - Create new workout, PUT /workouts/{workoutID} - Update workout, DELETE /workouts/{workoutID} - Delete workout.',
+          keywords: ['API', 'workout management', 'exercise plans', 'endpoints']
+        },
+        {
+          id: 'api-4',
+          title: 'Progress Tracking Endpoints',
+          content: 'GET /progress/{email} - Retrieve user\'s progress logs, POST /progress - Record new progress, PUT /progress/{progressID} - Update progress record, DELETE /progress/{progressID} - Remove progress entry.',
+          keywords: ['API', 'progress tracking', 'performance metrics', 'endpoints']
+        },
+        {
+          id: 'api-5',
+          title: 'Authentication Endpoints',
+          content: 'POST /api/auth/login - User login, POST /api/auth/register - User registration, POST /api/auth/logout - User logout.',
+          keywords: ['API', 'authentication', 'login', 'registration', 'endpoints']
+        },
+        {
+          id: 'api-6',
+          title: 'External API Integration - Supabase',
+          content: 'Functions for working with Supabase: getUserProfile, getUserPlans, getPlanDetails, getUserProgress. Includes Supabase setup and configuration.',
+          keywords: ['Supabase', 'external API', 'database operations', 'user data']
+        },
+        {
+          id: 'api-7',
+          title: 'External API Integration - Writer',
+          content: 'Writer API integration for AI-generated content with functions like generateFitnessPlan that uses the API to generate personalized fitness plans based on user profile and neurotesting results.',
+          keywords: ['Writer API', 'AI content', 'fitness plans', 'personalization']
+        },
+        {
+          id: 'api-8',
+          title: 'External API Integration - Kinescope',
+          content: 'Kinescope API integration for video management with functions getVideoDetails, getVideoAssets, and searchVideos to access video content for workouts.',
+          keywords: ['Kinescope API', 'video management', 'workout videos', 'streaming']
+        },
+        {
+          id: 'api-9',
+          title: 'Authentication and Security',
+          content: 'JWT-based Authentication with secure token generation and validation, token refresh mechanism, and session timeout handling. Role-based access control, permission verification middleware, and resource ownership validation.',
+          keywords: ['authentication', 'JWT', 'security', 'authorization', 'access control']
+        }
+      ]
+    },
+    features: {
+      title: 'Key Features',
+      items: [
+        {
+          id: 'feat-1',
+          title: 'Personalized Program Generation',
+          content: 'Creates tailored fitness plans based on user profiles and metrics, fitness goals and preferences, neurological testing results, and physical capabilities and limitations. Outputs weekly schedules, daily workouts, exercise instructions, and progression metrics.',
+          keywords: ['personalized programs', 'tailored plans', 'fitness goals', 'AI generation']
+        },
+        {
+          id: 'feat-2',
+          title: 'Neurotesting System',
+          content: 'Test administration with guided assessment process, cognitive and physical tests, real-time data collection, and standardized scoring. Result analysis with processing of test results, normalization against population averages, identification of strengths and improvement areas, and trend analysis.',
+          keywords: ['neurotesting', 'cognitive assessment', 'standardized tests', 'result analysis']
+        },
+        {
+          id: 'feat-3',
+          title: 'Plan Generation System',
+          content: 'AI-Driven Customization analyzing user profile and test results, selecting appropriate exercise types, planning intensity and progression, and balancing physical and cognitive elements. Schedule Creation with weekly workout planning, session scheduling, appropriate rest periods, and progressive overload principles.',
+          keywords: ['plan generation', 'AI customization', 'workout scheduling', 'progression planning']
+        },
+        {
+          id: 'feat-4',
+          title: 'Video Content Management',
+          content: 'Libraries and Categories with structured content organization, trainer-based organization, effect-based categorization, and difficulty level classification. Streaming Integration with Kinescope.io API, adaptive quality streaming, mobile and desktop optimization, and offline capability.',
+          keywords: ['video content', 'content organization', 'streaming', 'offline access']
+        },
+        {
+          id: 'feat-5',
+          title: 'Adaptive Monitoring',
+          content: 'Data collection of workout completion status, exercise performance metrics, neural test scores, recovery indicators, and user-reported feedback. Adaptation triggers include performance plateaus, completion rate changes, recovery pattern alterations, and user satisfaction metrics.',
+          keywords: ['adaptive monitoring', 'data collection', 'performance tracking', 'adaptation triggers']
+        },
+        {
+          id: 'feat-6',
+          title: 'Progressive Development',
+          content: 'Progression framework with phases: Foundation Development (1-2 weeks), Integration Phase (2-4 weeks), Performance Enhancement (4-6 weeks), and Mastery and Maintenance (6-8 weeks). Adaptation metrics for neural and physical progress.',
+          keywords: ['progressive development', 'training phases', 'performance enhancement', 'adaptation metrics']
+        },
+        {
+          id: 'feat-7',
+          title: 'Real-time Progress Adaptation',
+          content: 'Adapts plans based on user progress by getting workout history, analyzing progress using Writer API, and generating plan adjustments including intensity changes, focus areas, exercise types, and recovery adjustments.',
+          keywords: ['progress adaptation', 'real-time adjustments', 'performance analysis', 'plan modifications']
+        },
+        {
+          id: 'feat-8',
+          title: 'AI-Driven Exercise Recommendations',
+          content: 'Recommends exercises based on user profile, neurotesting results, focus areas, and difficulty level. Analyzes test results for focus priorities and adapts exercises for health restrictions.',
+          keywords: ['exercise recommendations', 'AI-driven', 'focus areas', 'health adaptations']
+        }
+      ]
+    },
+    implementation: {
+      title: 'Implementation Guidelines',
+      items: [
+        {
+          id: 'impl-1',
+          title: 'Project Structure',
+          content: 'Next.js project structure organized into folders: /app (API routes, page components), /components (UI, dashboard, workout, plan components), /lib (utilities, API integrations), /hooks (custom React hooks), and /types (TypeScript type definitions).',
+          keywords: ['project structure', 'Next.js', 'folders', 'organization']
+        },
+        {
+          id: 'impl-2',
+          title: 'Component Development',
+          content: 'Guidelines include using "use client" directive, Tailwind CSS for styling, Lucide React for icons, following responsive design principles, and implementing proper error handling. Follow mobile-first responsive approach and maintain consistent spacing and layout.',
+          keywords: ['component development', 'Tailwind CSS', 'responsive design', 'error handling']
+        },
+        {
+          id: 'impl-3',
+          title: 'State Management',
+          content: 'Approach uses useState for component-level state, React Query for server state management, Context API for app-wide state, and Supabase for database storage. Feature-based state organization with clear separation of concerns and proper error handling.',
+          keywords: ['state management', 'useState', 'React Query', 'Context API', 'Supabase']
+        },
+        {
+          id: 'impl-4',
+          title: 'API Integration',
+          content: 'Guidelines for API integration include using React Query for data fetching and caching, centralized error handling, user-friendly error messages, automatic retry for failures, and consistent request/response formats with proper validation.',
+          keywords: ['API integration', 'React Query', 'error handling', 'data fetching', 'validation']
+        },
+        {
+          id: 'impl-5',
+          title: 'Development Workflow',
+          content: 'Version control with feature branches and pull requests, quality assurance with ESLint, Prettier, Jest, and TypeScript, and deployment process with multiple environments and GitHub Actions for CI/CD.',
+          keywords: ['development workflow', 'version control', 'quality assurance', 'deployment', 'CI/CD']
+        },
+        {
+          id: 'impl-6',
+          title: 'Deployment Strategy',
+          content: 'Strategy includes development environment (local development with testing), staging environment (Vercel/AWS Amplify with monitoring), production environment (with CDN, security measures, and monitoring), and CI/CD pipeline configuration.',
+          keywords: ['deployment strategy', 'environments', 'production', 'staging', 'monitoring']
+        },
+        {
+          id: 'impl-7',
+          title: 'Security Considerations',
+          content: 'Security measures include authentication security (password hashing, session management), data protection (encryption, HTTPS, row-level security), API security (rate limiting, CORS, input validation), and compliance with regulations.',
+          keywords: ['security', 'authentication', 'data protection', 'API security', 'compliance']
+        }
+      ]
+    },
+    user_journeys: {
+      title: 'User Journeys',
+      items: [
+        {
+          id: 'journey-1',
+          title: 'New User Onboarding',
+          content: 'User registers and creates an account, completes profile setup (demographics, fitness goals), takes the neurofitness assessment, system generates an initial personalized fitness plan, and user reviews and confirms the plan.',
+          keywords: ['onboarding', 'registration', 'profile setup', 'neurofitness assessment']
+        },
+        {
+          id: 'journey-2',
+          title: 'Daily Workout Flow',
+          content: 'User logs in and views their dashboard, selects the current day's workout, watches and follows along with workout videos, system tracks completion and progress, and user receives post-workout feedback and recommendations.',
+          keywords: ['daily workout', 'video following', 'progress tracking', 'feedback']
+        },
+        {
+          id: 'journey-3',
+          title: 'Progress Tracking and Plan Adjustment',
+          content: 'User completes workouts over multiple weeks, views progress tracking dashboard, system analyzes performance metrics, system suggests plan adjustments based on progress, and user reviews and accepts updated plan.',
+          keywords: ['progress tracking', 'performance metrics', 'plan adjustment', 'long-term progress']
+        }
+      ]
+    }
+  };
+
+  // Filter items based on search query
+  const filterItems = (items) => {
+    if (!searchQuery) return items;
+
+    return items.filter(item =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.keywords.some(keyword => keyword.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  };
+
+  const getActiveItems = () => {
+    const category = vectorDB[activeCategory];
+    if (!category) return [];
+    return filterItems(category.items);
+  };
+
+  // Get active category title
+  const getActiveCategoryTitle = () => {
+    return vectorDB[activeCategory]?.title || 'Category';
+  };
+
+  // Handle item click
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-16 md:w-64 bg-gray-900 text-white">
+        <div className="p-4 font-bold text-lg hidden md:block">Neuronline DB</div>
+        <div className="p-2 md:hidden text-center">
+          <Database className="mx-auto" />
+        </div>
+        <nav className="mt-6">
+          <ul>
+            {Object.keys(vectorDB).map((category) => (
+              <li key={category} className="mb-2">
+                <button
+                  onClick={() => {
+                    setActiveCategory(category);
+                    setSelectedItem(null);
+                  }}
+                  className={`flex items-center p-2 w-full text-left ${
+                    activeCategory === category ? 'bg-gray-800' : 'hover:bg-gray-800'
+                  }`}
+                >
+                  {category === 'overview' && <FileText className="h-5 w-5 mr-3" />}
+                  {category === 'architecture' && <Layout className="h-5 w-5 mr-3" />}
+                  {category === 'database' && <Database className="h-5 w-5 mr-3" />}
+                  {category === 'components' && <Code className="h-5 w-5 mr-3" />}
+                  {category === 'api' && <Server className="h-5 w-5 mr-3" />}
+                  {category === 'features' && <Activity className="h-5 w-5 mr-3" />}
+                  {category === 'implementation' && <Book className="h-5 w-5 mr-3" />}
+                  {category === 'user_journeys' && <Settings className="h-5 w-5 mr-3" />}
+                  <span className="hidden md:inline">{vectorDB[category].title}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Search bar */}
+        <div className="p-4 bg-white shadow">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search vector database..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Content area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Items list */}
+          <div className="w-1/3 overflow-auto border-r">
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-bold">{getActiveCategoryTitle()}</h2>
+              <p className="text-sm text-gray-500">
+                {getActiveItems().length} items
+              </p>
+            </div>
+            <ul>
+              {getActiveItems().map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => handleItemClick(item)}
+                    className={`w-full p-4 text-left border-b hover:bg-gray-50 ${
+                      selectedItem?.id === item.id ? 'bg-blue-50' : ''
+                    }`}
+                  >
+                    <h3 className="font-medium">{item.title}</h3>
+                    <p className="text-sm text-gray-500 truncate">{item.content.substring(0, 100)}...</p>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Item details */}
+          <div className="flex-1 overflow-auto p-6">
+            {selectedItem ? (
+              <div>
+                <h2 className="text-2xl font-bold mb-4">{selectedItem.title}</h2>
+                <div className="bg-white p-4 rounded-lg shadow mb-4">
+                  <p className="whitespace-pre-line">{selectedItem.content}</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Keywords</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedItem.keywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-400">
+                <p>Select an item to view details</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NeuronlineVectorDB;

@@ -1,0 +1,21 @@
+{
+  "name": "neuro-chat",
+  "version": "1.0.0",
+  "description": "Neurofitness onboarding chat application",
+  "scripts": {
+    "dev": "http-server . -p 3000",
+    "test": "playwright test",
+    "test:e2e": "playwright test tests/e2e"
+  },
+  "dependencies": {
+    "alpinejs": "^3.13.3",
+    "tailwindcss": "^3.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^20.11.30",
+    "http-server": "^14.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}

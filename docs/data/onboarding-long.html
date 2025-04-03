@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuronline - Onboarding</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#B7F501', // Neon green
+                        background: '#0F0F0F', // Near black
+                        surface: '#1A1A1A', // Dark gray
+                        surfaceLight: '#2A2A2A', // Lighter dark gray
+                        textPrimary: '#FFFFFF', // White
+                        textSecondary: '#A0A0A0', // Light gray
+                        accent1: '#00D1FF', // Cyan
+                        accent2: '#FF00E5', // Magenta
+                        accent3: '#FF9500', // Orange
+                        success: '#00C853', // Green
+                        warning: '#FFD600', // Yellow
+                        error: '#FF5252', // Red
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-in': 'slideIn 0.5s ease-out forwards',
+                        'slide-out': 'slideOut 0.5s ease-in forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'fade-out': 'fadeOut 0.3s ease-in forwards',
+                        'scale-in': 'scaleIn 0.3s ease-out forwards',
+                        'bounce-in': 'bounceIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: 0 },
+                            '100%': { transform: 'translateX(0)', opacity: 1 },
+                        },
+                        slideOut: {
+                            '0%': { transform: 'translateX(0)', opacity: 1 },
+                            '100%': { transform: 'translateX(-100%)', opacity: 0 },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 },
+                        },
+                        fadeOut: {
+                            '0%': { opacity: 1 },
+                            '100%': { opacity: 0 },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: 0 },
+                            '100%': { transform: 'scale(1)', opacity: 1 },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: 0 },
+                            '50%': { transform: 'scale(1.05)', opacity: 0.8 },
+                            '70%': { transform: 'scale(0.9)', opacity: 0.9 },
+                            '100%': { transform: 'scale(1)', opacity: 1 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        .bg-blur {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .brain-bg {
+            background: radial-gradient(circle at center, rgba(183, 245, 1, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+        }
+
+        .stars {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+            box-shadow: 1744px 122px #fff, 134px 1321px #fff, 92px 859px #fff, 235px 1045px #fff, 366px 912px #fff, 491px 942px #fff, 14px 1831px #fff, 582px 476px #fff, 588px 1230px #fff, 1520px 1343px #fff, 1671px 203px #fff, 550px 341px #fff, 1491px 549px #fff, 558px 161px #fff, 896px 1823px #fff, 999px 1463px #fff, 1557px 636px #fff, 1754px 1307px #fff, 178px 1489px #fff, 1482px 571px #fff, 1123px 1831px #fff, 1377px 1331px #fff, 2000px 1665px #fff, 145px 1530px #fff, 1338px 1732px #fff, 1372px 735px #fff, 1658px 1139px #fff, 578px 1914px #fff, 1096px 1951px #fff, 643px 1562px #fff, 1633px 1257px #fff, 1133px 1952px #fff, 1538px 1155px #fff, 1108px 1042px #fff, 1281px 1822px #fff, 966px 1746px #fff, 934px 938px #fff, 1438px 1186px #fff, 355px 1542px #fff, 1845px 178px #fff, 837px 1753px #fff, 373px 1877px #fff, 1544px 1705px #fff, 106px 1308px #fff, 1334px 1277px #fff, 1611px 1599px #fff, 1212px 537px #fff, 214px 582px #fff, 1857px 1074px #fff, 1707px 1812px #fff;
+            animation: animStar 50s linear infinite;
+        }
+
+        @keyframes animStar {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-2000px); }
+        }
+    </style>
+</head>
+<body class="bg-background text-textPrimary min-h-screen">
+    <div class="stars"></div>
+
+    <div x-data="neuronlineOnboarding()" x-cloak>
+        <!-- Progress bar -->
+        <div class="fixed top-0 left-0 right-0 z-50 h-1 bg-surface">
+            <div
+                class="h-full bg-primary transition-all duration-300 ease-out"
+                :style="`width: ${(currentStep / (steps.length - 1)) * 100}%`"
+            ></div>
+        </div>
+
+        <!-- Header -->
+        <header class="fixed top-0 left-0 right-0 z-40 py-4 px-6 bg-surface/80 bg-blur mt-1">
+            <div class="flex justify-between items-center max-w-7xl mx-auto">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center bg-primary">
+                        <i data-lucide="brain" class="w-5 h-5 text-black"></i>
+                    </div>
+                    <span class="font-bold text-xl">Neuronline</span>
+                </div>
+
+                <div class="hidden md:flex items-center gap-3">
+                    <template x-for="(step, idx) in steps" :key="idx">
+                        <div class="flex items-center">
+                            <div
+                                class="w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all duration-300"
+                                :class="idx < currentStep ? 'bg-primary text-black' : idx === currentStep ? 'border-2 border-primary text-primary' : 'bg-surfaceLight text-textSecondary'"
+                            >
+                                <span x-text="idx + 1"></span>
+                            </div>
+                            <div
+                                x-show="idx < steps.length - 1"
+                                class="w-8 h-0.5 mx-1"
+                                :class="idx < currentStep ? 'bg-primary' : 'bg-surfaceLight'"
+                            ></div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="text-textSecondary text-sm">
+                    <span x-text="currentStep + 1"></span> из <span x-text="steps.length"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="pt-24 pb-24 px-4 md:px-8 max-w-7xl mx-auto min-h-screen flex items-center">
+            <div class="w-full">
+                <!-- Step content container with transitions -->
+                <div class="relative overflow-hidden">
+                    <!-- Landing Page -->
+                    <div
+                        x-show="currentStep === 0"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-2xl mx-auto text-center"
+                    >
+                        <div class="mb-8 animate-float">
+                            <svg width="120" height="120" viewBox="0 0 200 200" class="mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 20C55.8172 20 20 55.8172 20 100C20 144.183 55.8172 180 100 180C144.183 180 180 144.183 180 100C180 55.8172 144.183 20 100 20Z" stroke="#B7F501" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M60 80C60 63.4315 73.4315 50 90 50C106.569 50 120 63.4315 120 80C120 96.5685 106.569 110 90 110" stroke="#B7F501" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M140 80C140 63.4315 126.569 50 110 50C93.4315 50 80 63.4315 80 80C80 96.5685 93.4315 110 110 110" stroke="#B7F501" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M60 120C60 136.569 73.4315 150 90 150C106.569 150 120 136.569 120 120C120 103.431 106.569 90 90 90" stroke="#B7F501" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M140 120C140 136.569 126.569 150 110 150C93.4315 150 80 136.569 80 120C80 103.431 93.4315 90 110 90" stroke="#B7F501" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent1">
+                            Neuronline
+                        </h1>
+                        <p class="text-xl mb-6">Платформа нейрофитнеса нового поколения</p>
+                        <p class="text-textSecondary mb-10 max-w-lg mx-auto">
+                            Объединяем тренировки для мозга и тела в уникальный подход к фитнесу,
+                            основанный на нейрофизиологии и когнитивной науке
+                        </p>
+                        <button
+                            @click="nextStep()"
+                            class="px-8 py-3 bg-primary text-black font-medium rounded-full flex items-center gap-2 mx-auto hover:scale-105 transition-transform"
+                        >
+                            <span>Начать</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <!-- Registration Form -->
+                    <div
+                        x-show="currentStep === 1"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-md mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Создайте аккаунт</h2>
+                        <p class="text-textSecondary mb-6">Зарегистрируйтесь, чтобы начать путь к улучшению физических и когнитивных способностей</p>
+
+                        <form @submit.prevent="nextStep()" class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-sm text-textSecondary mb-1">Email</label>
+                                <div class="relative">
+                                    <i data-lucide="mail" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary"></i>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        x-model="userData.email"
+                                        class="w-full bg-surfaceLight rounded-lg py-3 px-10 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        placeholder="your@email.com"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="name" class="block text-sm text-textSecondary mb-1">Имя</label>
+                                <div class="relative">
+                                    <i data-lucide="user" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary"></i>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        x-model="userData.name"
+                                        class="w-full bg-surfaceLight rounded-lg py-3 px-10 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        placeholder="Ваше имя"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="password" class="block text-sm text-textSecondary mb-1">Пароль</label>
+                                <div class="relative">
+                                    <i data-lucide="lock" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary"></i>
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        x-model="userData.password"
+                                        class="w-full bg-surfaceLight rounded-lg py-3 px-10 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        placeholder="Минимум 8 символов"
+                                        required
+                                        minlength="8"
+                                    >
+                                    <button
+                                        type="button"
+                                        @click="togglePasswordVisibility()"
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-textSecondary"
+                                    >
+                                        <i x-show="!showPassword" data-lucide="eye" class="w-5 h-5"></i>
+                                        <i x-show="showPassword" data-lucide="eye-off" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
+                                <button
+                                    type="submit"
+                                    class="w-full bg-primary text-black font-medium rounded-lg py-3 hover:bg-opacity-90 transition-colors"
+                                >
+                                    Зарегистрироваться
+                                </button>
+                            </div>
+
+                            <div class="text-center text-sm text-textSecondary">
+                                Уже есть аккаунт? <a href="#" class="text-primary hover:underline">Войти</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Basic Profile Creation -->
+                    <div
+                        x-show="currentStep === 2"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-md mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Расскажите о себе</h2>
+                        <p class="text-textSecondary mb-6">Эта информация поможет нам создать персонализированную программу</p>
+
+                        <form @submit.prevent="nextStep()" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="age" class="block text-sm text-textSecondary mb-1">Возраст</label>
+                                    <input
+                                        type="number"
+                                        id="age"
+                                        x-model="userData.age"
+                                        class="w-full bg-surfaceLight rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        placeholder="Лет"
+                                        min="14"
+                                        max="100"
+                                        required
+                                    >
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm text-textSecondary mb-1">Пол</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button
+                                            type="button"
+                                            @click="userData.gender = 'male'"
+                                            class="py-3 rounded-lg flex items-center justify-center transition-colors"
+                                            :class="userData.gender === 'male' ? 'bg-primary text-black' : 'bg-surfaceLight text-textPrimary'"
+                                        >
+                                            <i data-lucide="mars" class="w-4 h-4 mr-1"></i>
+                                            Мужской
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="userData.gender = 'female'"
+                                            class="py-3 rounded-lg flex items-center justify-center transition-colors"
+                                            :class="userData.gender === 'female' ? 'bg-primary text-black' : 'bg-surfaceLight text-textPrimary'"
+                                        >
+                                            <i data-lucide="venus" class="w-4 h-4 mr-1"></i>
+                                            Женский
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="height" class="block text-sm text-textSecondary mb-1">Рост (см)</label>
+                                    <input
+                                        type="number"
+                                        id="height"
+                                        x-model="userData.height"
+                                        class="w-full bg-surfaceLight rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        placeholder="см"
+                                        min="100"
+                                        max="250"
+                                        required
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="weight" class="block text-sm text-textSecondary mb-1">Вес (кг)</label>
+                                    <input
+                                        type="number"
+                                        id="weight"
+                                        x-model="userData.weight"
+                                        class="w-full bg-surfaceLight rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        placeholder="кг"
+                                        min="30"
+                                        max="250"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="pt-4 flex justify-between">
+                                <button
+                                    type="button"
+                                    @click="prevStep()"
+                                    class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                                >
+                                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                    <span>Назад</span>
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                                >
+                                    <span>Продолжить</span>
+                                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Fitness Goals Selection -->
+                    <div
+                        x-show="currentStep === 3"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-xl mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Выберите ваши цели</h2>
+                        <p class="text-textSecondary mb-6">Укажите, чего вы хотите достичь с помощью наших тренировок</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                            <template x-for="goal in fitnessGoals" :key="goal.id">
+                                <div
+                                    @click="toggleGoal(goal.id)"
+                                    class="p-4 rounded-xl cursor-pointer transition-all duration-300 flex items-center gap-4"
+                                    :class="userData.goals.includes(goal.id) ? 'bg-primary/20 border border-primary' : 'bg-surfaceLight hover:bg-surface'"
+                                >
+                                    <div
+                                        class="w-12 h-12 rounded-full flex items-center justify-center"
+                                        :class="userData.goals.includes(goal.id) ? 'bg-primary text-black' : 'bg-surface text-primary'"
+                                    >
+                                        <i :data-lucide="goal.icon" class="w-6 h-6"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="font-medium" x-text="goal.name"></h3>
+                                        <p class="text-sm text-textSecondary" x-text="goal.description"></p>
+                                    </div>
+                                    <div
+                                        class="w-6 h-6 rounded-full flex items-center justify-center"
+                                        :class="userData.goals.includes(goal.id) ? 'bg-primary text-black' : 'border border-textSecondary'"
+                                    >
+                                        <i x-show="userData.goals.includes(goal.id)" data-lucide="check" class="w-4 h-4"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button
+                                @click="prevStep()"
+                                class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                            >
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                @click="nextStep()"
+                                class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                                :disabled="userData.goals.length === 0"
+                                :class="userData.goals.length === 0 ? 'opacity-50 cursor-not-allowed' : ''"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Availability Input -->
+                    <div
+                        x-show="currentStep === 4"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-xl mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Доступное оборудование</h2>
+                        <p class="text-textSecondary mb-6">Укажите, какое оборудование у вас есть для тренировок</p>
+
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                            <template x-for="equipment in equipmentOptions" :key="equipment.id">
+                                <div
+                                    @click="toggleEquipment(equipment.id)"
+                                    class="p-4 rounded-xl cursor-pointer transition-all duration-300 flex flex-col items-center text-center gap-2"
+                                    :class="userData.equipment.includes(equipment.id) ? 'bg-primary/20 border border-primary' : 'bg-surfaceLight hover:bg-surface'"
+                                >
+                                    <div
+                                        class="w-12 h-12 rounded-full flex items-center justify-center"
+                                        :class="userData.equipment.includes(equipment.id) ? 'bg-primary text-black' : 'bg-surface text-primary'"
+                                    >
+                                        <i :data-lucide="equipment.icon" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="font-medium" x-text="equipment.name"></h3>
+                                    <div
+                                        x-show="userData.equipment.includes(equipment.id)"
+                                        class="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center"
+                                    >
+                                        <i data-lucide="check" class="w-4 h-4"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="bg-surfaceLight p-4 rounded-lg mb-8">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="info" class="w-5 h-5 text-primary"></i>
+                                <p class="text-textSecondary">Не беспокойтесь, если у вас нет оборудования. Мы подберем упражнения, которые можно выполнять без дополнительного инвентаря.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button
+                                @click="prevStep()"
+                                class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                            >
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                @click="nextStep()"
+                                class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Training Days Preference -->
+                    <div
+                        x-show="currentStep === 5"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-xl mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Расписание тренировок</h2>
+                        <p class="text-textSecondary mb-6">Выберите дни и время, когда вам удобно тренироваться</p>
+
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium mb-3">Дни недели</h3>
+                            <div class="grid grid-cols-7 gap-2">
+                                <template x-for="(day, index) in ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']" :key="index">
+                                    <div
+                                        @click="toggleTrainingDay(index)"
+                                        class="aspect-square rounded-lg cursor-pointer flex items-center justify-center transition-all duration-300"
+                                        :class="userData.trainingDays.includes(index) ? 'bg-primary text-black' : 'bg-surfaceLight hover:bg-surface'"
+                                    >
+                                        <span x-text="day"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <h3 class="text-lg font-medium mb-3">Предпочтительное время</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <template x-for="timeSlot in timeSlots" :key="timeSlot.id">
+                                    <div
+                                        @click="userData.preferredTime = timeSlot.id"
+                                        class="p-3 rounded-lg cursor-pointer flex items-center gap-2 transition-all duration-300"
+                                        :class="userData.preferredTime === timeSlot.id ? 'bg-primary/20 border border-primary' : 'bg-surfaceLight hover:bg-surface'"
+                                    >
+                                        <i :data-lucide="timeSlot.icon" class="w-5 h-5" :class="userData.preferredTime === timeSlot.id ? 'text-primary' : 'text-textSecondary'"></i>
+                                        <span x-text="timeSlot.label"></span>
+                                        <div
+                                            x-show="userData.preferredTime === timeSlot.id"
+                                            class="w-4 h-4 ml-auto rounded-full bg-primary flex items-center justify-center"
+                                        >
+                                            <i data-lucide="check" class="w-3 h-3 text-black"></i>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button
+                                @click="prevStep()"
+                                class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                            >
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                @click="nextStep()"
+                                class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                                :disabled="userData.trainingDays.length === 0 || !userData.preferredTime"
+                                :class="userData.trainingDays.length === 0 || !userData.preferredTime ? 'opacity-50 cursor-not-allowed' : ''"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Neurotesting Assessment -->
+                    <div
+                        x-show="currentStep === 6"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-2xl mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Нейротестирование</h2>
+                        <p class="text-textSecondary mb-6">Пройдите короткие тесты для оценки ваших когнитивных способностей</p>
+
+                        <div x-show="!testActive" class="space-y-4 mb-8">
+                            <template x-for="test in neuroCognitiveTests" :key="test.id">
+                                <div class="bg-surfaceLight rounded-xl p-4 flex items-center gap-4">
+                                    <div
+                                        class="w-12 h-12 rounded-full flex items-center justify-center"
+                                        :class="`bg-${test.color}/20 text-${test.color}`"
+                                    >
+                                        <i :data-lucide="test.icon" class="w-6 h-6"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="font-medium" x-text="test.name"></h3>
+                                        <p class="text-sm text-textSecondary" x-text="test.description"></p>
+                                    </div>
+                                    <button
+                                        @click="startTest(test.id)"
+                                        class="px-4 py-2 rounded-lg text-black font-medium"
+                                        :class="`bg-${test.color}`"
+                                        x-show="!test.completed"
+                                    >
+                                        Пройти
+                                    </button>
+                                    <div
+                                        x-show="test.completed"
+                                        class="flex items-center gap-2"
+                                    >
+                                        <div class="w-6 h-6 rounded-full bg-success flex items-center justify-center">
+                                            <i data-lucide="check" class="w-4 h-4 text-black"></i>
+                                        </div>
+                                        <span class="font-medium" x-text="`${test.score}/100`"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Test Interface -->
+                        <div x-show="testActive" class="mb-8">
+                            <div class="bg-surface rounded-xl overflow-hidden">
+                                <div class="p-4 bg-surfaceLight flex justify-between items-center">
+                                    <div class="flex items-center gap-2">
+                                        <i :data-lucide="currentTest.icon" class="w-5 h-5" :class="`text-${currentTest.color}`"></i>
+                                        <span class="font-medium" x-text="currentTest.name"></span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="clock" class="w-4 h-4 text-textSecondary"></i>
+                                        <span x-text="`${testTimeRemaining}s`"></span>
+                                    </div>
+                                </div>
+
+                                <div class="h-80 relative flex items-center justify-center">
+                                    <!-- Memory Test -->
+                                    <div x-show="currentTest.id === 'memory'" class="w-full h-full flex flex-col items-center justify-center">
+                                        <div x-show="testPhase === 'instruction'" class="text-center p-6">
+                                            <h3 class="text-xl font-medium mb-4">Тест памяти</h3>
+                                            <p class="text-textSecondary mb-4">Запомните последовательность подсвеченных квадратов, а затем повторите ее.</p>
+                                            <button
+                                                @click="startTestSequence()"
+                                                class="px-6 py-2 rounded-lg text-black font-medium bg-accent2"
+                                            >
+                                                Начать
+                                            </button>
+                                        </div>
+
+                                        <div x-show="testPhase === 'sequence' || testPhase === 'repeat'" class="grid grid-cols-3 gap-4">
+                                            <template x-for="i in 9">
+                                                <div
+                                                    @click="testPhase === 'repeat' && checkMemorySequence(i-1)"
+                                                    class="w-16 h-16 rounded-lg cursor-pointer transition-all duration-200"
+                                                    :class="getMemoryTileClass(i-1)"
+                                                ></div>
+                                            </template>
+                                        </div>
+
+                                        <div x-show="testPhase === 'sequence'" class="mt-4 text-textSecondary">
+                                            Запоминайте последовательность...
+                                        </div>
+
+                                        <div x-show="testPhase === 'repeat'" class="mt-4 text-textSecondary">
+                                            Повторите последовательность
+                                        </div>
+                                    </div>
+
+                                    <!-- Reaction Test -->
+                                    <div x-show="currentTest.id === 'reaction'" class="w-full h-full relative">
+                                        <div x-show="testPhase === 'instruction'" class="text-center p-6">
+                                            <h3 class="text-xl font-medium mb-4">Тест реакции</h3>
+                                            <p class="text-textSecondary mb-4">Нажимайте на появляющиеся круги как можно быстрее.</p>
+                                            <button
+                                                @click="startReactionTest()"
+                                                class="px-6 py-2 rounded-lg text-black font-medium bg-accent3"
+                                            >
+                                                Начать
+                                            </button>
+                                        </div>
+
+                                        <template x-for="target in reactionTargets">
+                                            <div
+                                                x-show="testPhase === 'active' && target.active"
+                                                @click="hitReactionTarget(target)"
+                                                class="absolute w-12 h-12 rounded-full bg-accent3 cursor-pointer transition-transform hover:scale-110"
+                                                :style="`left: ${target.x}%; top: ${target.y}%;`"
+                                            ></div>
+                                        </template>
+
+                                        <div x-show="testPhase === 'active'" class="absolute top-4 left-4 bg-black/50 px-3 py-1 rounded-full">
+                                            <span class="text-sm">Счет: <span x-text="testScore"></span></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Focus Test -->
+                                    <div x-show="currentTest.id === 'focus'" class="w-full h-full flex flex-col items-center justify-center">
+                                        <div x-show="testPhase === 'instruction'" class="text-center p-6">
+                                            <h3 class="text-xl font-medium mb-4">Тест концентрации</h3>
+                                            <p class="text-textSecondary mb-4">Следите за движущимся объектом и нажимайте на кнопку, когда он меняет цвет.</p>
+                                            <button
+                                                @click="startFocusTest()"
+                                                class="px-6 py-2 rounded-lg text-black font-medium bg-accent1"
+                                            >
+                                                Начать
+                                            </button>
+                                        </div>
+
+                                        <div
+                                            x-show="testPhase === 'active'"
+                                            class="w-16 h-16 rounded-full transition-all duration-300"
+                                            :class="focusTargetHighlighted ? 'bg-accent1 animate-pulse' : 'bg-surfaceLight'"
+                                            :style="`transform: translate(${focusTargetX}px, ${focusTargetY}px);`"
+                                        ></div>
+
+                                        <button
+                                            x-show="testPhase === 'active'"
+                                            @click="checkFocusTarget()"
+                                            class="mt-8 px-6 py-2 rounded-lg bg-accent1 text-black font-medium"
+                                        >
+                                            Нажать
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 flex justify-between">
+                                    <button
+                                        @click="cancelTest()"
+                                        class="px-4 py-2 bg-surfaceLight rounded-lg"
+                                    >
+                                        Отмена
+                                    </button>
+
+                                    <div x-show="testPhase !== 'instruction'" class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                                        <span class="text-sm text-textSecondary">Тест активен</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button
+                                @click="prevStep()"
+                                class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                                :disabled="testActive"
+                                :class="testActive ? 'opacity-50 cursor-not-allowed' : ''"
+                            >
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                @click="nextStep()"
+                                class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                                :disabled="!allTestsCompleted() || testActive"
+                                :class="!allTestsCompleted() || testActive ? 'opacity-50 cursor-not-allowed' : ''"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cognitive Profile Generation -->
+                    <div
+                        x-show="currentStep === 7"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-2xl mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Ваш когнитивный профиль</h2>
+                        <p class="text-textSecondary mb-6">Результаты нейротестирования и рекомендации</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-surfaceLight rounded-xl p-5">
+                                <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                                    <i data-lucide="bar-chart-2" class="w-5 h-5 text-primary"></i>
+                                    <span>Общий результат</span>
+                                </h3>
+
+                                <div class="flex justify-center mb-4">
+                                    <div class="relative">
+                                        <svg class="w-32 h-32">
+                                            <circle
+                                                cx="64"
+                                                cy="64"
+                                                r="56"
+                                                stroke-width="12"
+                                                stroke="#2A2A2A"
+                                                fill="none"
+                                            />
+                                            <circle
+                                                cx="64"
+                                                cy="64"
+                                                r="56"
+                                                stroke-width="12"
+                                                stroke="#B7F501"
+                                                stroke-dasharray="351.86"
+                                                :stroke-dashoffset="351.86 - (351.86 * getAverageTestScore() / 100)"
+                                                fill="none"
+                                                class="transition-all duration-1000 ease-out"
+                                                transform="rotate(-90 64 64)"
+                                            />
+                                        </svg>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <span class="text-3xl font-bold" x-text="Math.round(getAverageTestScore())"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center">
+                                    <p class="text-textSecondary mb-2">Ваш уровень</p>
+                                    <p class="text-lg font-medium" x-text="getCognitiveLevel()"></p>
+                                </div>
+                            </div>
+
+                            <div class="bg-surfaceLight rounded-xl p-5">
+                                <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                                    <i data-lucide="activity" class="w-5 h-5 text-primary"></i>
+                                    <span>Детализация</span>
+                                </h3>
+
+                                <div class="space-y-4">
+                                    <template x-for="test in neuroCognitiveTests" :key="test.id">
+                                        <div>
+                                            <div class="flex justify-between items-center mb-1">
+                                                <span class="text-sm text-textSecondary" x-text="test.name"></span>
+                                                <span class="text-sm font-medium" x-text="`${test.score}/100`"></span>
+                                            </div>
+                                            <div class="h-2 rounded-full bg-surface overflow-hidden">
+                                                <div
+                                                    class="h-full rounded-full transition-all duration-1000 ease-out"
+                                                    :class="`bg-${test.color}`"
+                                                    :style="`width: ${test.score}%`"
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-surfaceLight rounded-xl p-5 mb-8">
+                            <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                                <i data-lucide="lightbulb" class="w-5 h-5 text-primary"></i>
+                                <span>Рекомендации</span>
+                            </h3>
+
+                            <ul class="space-y-3">
+                                <template x-for="(recommendation, index) in getCognitiveRecommendations()" :key="index">
+                                    <li class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span x-text="index + 1"></span>
+                                        </div>
+                                        <p x-text="recommendation"></p>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button
+                                @click="prevStep()"
+                                class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                            >
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                @click="nextStep()"
+                                class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Plan Generation -->
+                    <div
+                        x-show="currentStep === 8"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-2xl mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Генерация персонализированного плана</h2>
+                        <p class="text-textSecondary mb-6">Наш ИИ создает оптимальный план тренировок на основе ваших данных</p>
+
+                        <div x-show="planGenerationStep < 3" class="bg-surfaceLight rounded-xl p-6 mb-8">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                                    <i data-lucide="cpu" class="w-6 h-6 text-primary"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">Neuronline AI</h3>
+                                    <p class="text-sm text-textSecondary">Создает ваш персональный план</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                                        :class="planGenerationStep >= 0 ? 'bg-primary text-black' : 'bg-surfaceLight text-textSecondary border border-textSecondary'"
+                                    >
+                                        <i x-show="planGenerationStep > 0" data-lucide="check" class="w-4 h-4"></i>
+                                        <span x-show="planGenerationStep === 0">1</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p :class="planGenerationStep >= 0 ? 'text-textPrimary' : 'text-textSecondary'">
+                                            Анализ профиля и результатов тестирования
+                                        </p>
+                                        <div x-show="planGenerationStep === 0" class="mt-2 flex items-center gap-2">
+                                            <div class="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+                                            <span class="text-sm text-textSecondary">Обработка данных...</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="w-0.5 h-6 bg-textSecondary mx-auto" :class="planGenerationStep >= 1 ? 'bg-primary' : ''"></div>
+
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                                        :class="planGenerationStep >= 1 ? 'bg-primary text-black' : 'bg-surfaceLight text-textSecondary border border-textSecondary'"
+                                    >
+                                        <i x-show="planGenerationStep > 1" data-lucide="check" class="w-4 h-4"></i>
+                                        <span x-show="planGenerationStep === 1">2</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p :class="planGenerationStep >= 1 ? 'text-textPrimary' : 'text-textSecondary'">
+                                            Подбор оптимальных упражнений и нагрузки
+                                        </p>
+                                        <div x-show="planGenerationStep === 1" class="mt-2 flex items-center gap-2">
+                                            <div class="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+                                            <span class="text-sm text-textSecondary">Создание программы...</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="w-0.5 h-6 bg-textSecondary mx-auto" :class="planGenerationStep >= 2 ? 'bg-primary' : ''"></div>
+
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                                        :class="planGenerationStep >= 2 ? 'bg-primary text-black' : 'bg-surfaceLight text-textSecondary border border-textSecondary'"
+                                    >
+                                        <i x-show="planGenerationStep > 2" data-lucide="check" class="w-4 h-4"></i>
+                                        <span x-show="planGenerationStep === 2">3</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p :class="planGenerationStep >= 2 ? 'text-textPrimary' : 'text-textSecondary'">
+                                            Формирование расписания и прогрессии
+                                        </p>
+                                        <div x-show="planGenerationStep === 2" class="mt-2 flex items-center gap-2">
+                                            <div class="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+                                            <span class="text-sm text-textSecondary">Финализация плана...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div x-show="planGenerationStep === 3" class="space-y-6 mb-8">
+                            <div class="bg-surfaceLight rounded-xl p-5">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                        <i data-lucide="check" class="w-5 h-5 text-black"></i>
+                                    </div>
+                                    <h3 class="text-lg font-medium">План создан успешно!</h3>
+                                </div>
+
+                                <div class="p-4 bg-surface rounded-lg mb-4">
+                                    <h4 class="font-medium mb-2" x-text="generatedPlan.name"></h4>
+                                    <p class="text-sm text-textSecondary mb-3" x-text="generatedPlan.description"></p>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        <div class="px-3 py-1 rounded-full bg-surfaceLight text-textSecondary text-sm flex items-center gap-1">
+                                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                                            <span x-text="`${generatedPlan.duration} недель`"></span>
+                                        </div>
+                                        <div class="px-3 py-1 rounded-full bg-surfaceLight text-textSecondary text-sm flex items-center gap-1">
+                                            <i data-lucide="clock" class="w-4 h-4"></i>
+                                            <span x-text="`${generatedPlan.sessionsPerWeek}x в неделю`"></span>
+                                        </div>
+                                        <div class="px-3 py-1 rounded-full bg-surfaceLight text-textSecondary text-sm flex items-center gap-1">
+                                            <i data-lucide="activity" class="w-4 h-4"></i>
+                                            <span x-text="generatedPlan.level"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <h4 class="font-medium text-sm text-textSecondary">Ключевые особенности:</h4>
+                                    <ul class="space-y-2">
+                                        <template x-for="(feature, index) in generatedPlan.features" :key="index">
+                                            <li class="flex items-start gap-2">
+                                                <i data-lucide="check-circle" class="w-5 h-5 text-primary mt-0.5"></i>
+                                                <span x-text="feature"></span>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="bg-surfaceLight rounded-xl p-5">
+                                <h3 class="font-medium mb-4">Пример тренировки</h3>
+
+                                <div class="space-y-3">
+                                    <template x-for="(exercise, index) in generatedPlan.sampleExercises" :key="index">
+                                        <div class="p-3 bg-surface rounded-lg flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                                                <i :data-lucide="exercise.icon" class="w-5 h-5 text-primary"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="font-medium" x-text="exercise.name"></p>
+                                                <p class="text-sm text-textSecondary" x-text="exercise.sets"></p>
+                                            </div>
+                                            <i data-lucide="chevron-right" class="w-5 h-5 text-textSecondary"></i>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button
+                                @click="prevStep()"
+                                class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                                :disabled="planGenerationStep < 3"
+                                :class="planGenerationStep < 3 ? 'opacity-50 cursor-not-allowed' : ''"
+                            >
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                @click="nextStep()"
+                                class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                                :disabled="planGenerationStep < 3"
+                                :class="planGenerationStep < 3 ? 'opacity-50 cursor-not-allowed' : ''"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Plan Review -->
+                    <div
+                        x-show="currentStep === 9"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-2xl mx-auto"
+                    >
+                        <h2 class="text-2xl font-bold mb-2">Ваш персонализированный план</h2>
+                        <p class="text-textSecondary mb-6">Просмотрите и настройте свой план тренировок</p>
+
+                        <div class="bg-surfaceLight rounded-xl p-5 mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium" x-text="generatedPlan.name"></h3>
+                                <div class="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm">
+                                    <span x-text="generatedPlan.level"></span>
+                                </div>
+                            </div>
+
+                            <p class="text-textSecondary mb-4" x-text="generatedPlan.description"></p>
+
+                            <div class="flex flex-wrap gap-3 mb-6">
+                                <div class="px-3 py-1.5 rounded-full bg-surface text-textSecondary text-sm flex items-center gap-1">
+                                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                                    <span x-text="`${generatedPlan.duration} недель`"></span>
+                                </div>
+                                <div class="px-3 py-1.5 rounded-full bg-surface text-textSecondary text-sm flex items-center gap-1">
+                                    <i data-lucide="clock" class="w-4 h-4"></i>
+                                    <span x-text="`${generatedPlan.sessionsPerWeek}x в неделю`"></span>
+                                </div>
+                                <div class="px-3 py-1.5 rounded-full bg-surface text-textSecondary text-sm flex items-center gap-1">
+                                    <i data-lucide="dumbbell" class="w-4 h-4"></i>
+                                    <span x-text="`${generatedPlan.workoutDuration} мин`"></span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 mb-6">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-medium">Физическая нагрузка</h4>
+                                    <div class="flex space-x-1">
+                                        <template x-for="i in 5">
+                                            <div
+                                                class="w-4 h-1 rounded-full"
+                                                :class="i <= generatedPlan.physicalIntensity ? 'bg-primary' : 'bg-surface'"
+                                            ></div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-medium">Когнитивная нагрузка</h4>
+                                    <div class="flex space-x-1">
+                                        <template x-for="i in 5">
+                                            <div
+                                                class="w-4 h-1 rounded-full"
+                                                :class="i <= generatedPlan.cognitiveIntensity ? 'bg-primary' : 'bg-surface'"
+                                            ></div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-medium">Сложность</h4>
+                                    <div class="flex space-x-1">
+                                        <template x-for="i in 5">
+                                            <div
+                                                class="w-4 h-1 rounded-full"
+                                                :class="i <= generatedPlan.difficulty ? 'bg-primary' : 'bg-surface'"
+                                            ></div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-primary/10 rounded-lg">
+                                <h4 class="font-medium mb-2">Структура программы</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1 h-4 rounded-full bg-primary"></div>
+                                        <span class="text-sm text-textSecondary">Фаза 1: Адаптация (2 недели)</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1 h-4 rounded-full bg-accent1"></div>
+                                        <span class="text-sm text-textSecondary">Фаза 2: Развитие (2 недели)</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1 h-4 rounded-full bg-accent2"></div>
+                                        <span class="text-sm text-textSecondary">Фаза 3: Прогрессия (2 недели)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-surfaceLight rounded-xl p-5 mb-8">
+                            <h3 class="font-medium mb-4">Настройка плана</h3>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm text-textSecondary mb-2">Длительность тренировки</label>
+                                    <div class="flex items-center gap-4">
+                                        <input
+                                            type="range"
+                                            min="15"
+                                            max="60"
+                                            step="5"
+                                            x-model="generatedPlan.workoutDuration"
+                                            class="flex-1 accent-primary"
+                                        >
+                                        <span class="text-sm font-medium w-12 text-center" x-text="`${generatedPlan.workoutDuration} мин`"></span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm text-textSecondary mb-2">Сложность</label>
+                                    <div class="flex gap-2">
+                                        <button
+                                            @click="generatedPlan.difficulty = 1; generatedPlan.level = 'Начальный'"
+                                            class="flex-1 py-2 rounded-lg transition-colors"
+                                            :class="generatedPlan.difficulty === 1 ? 'bg-primary text-black' : 'bg-surface'"
+                                        >
+                                            Легкий
+                                        </button>
+                                        <button
+                                            @click="generatedPlan.difficulty = 3; generatedPlan.level = 'Средний'"
+                                            class="flex-1 py-2 rounded-lg transition-colors"
+                                            :class="generatedPlan.difficulty === 3 ? 'bg-primary text-black' : 'bg-surface'"
+                                        >
+                                            Средний
+                                        </button>
+                                        <button
+                                            @click="generatedPlan.difficulty = 5; generatedPlan.level = 'Продвинутый'"
+                                            class="flex-1 py-2 rounded-lg transition-colors"
+                                            :class="generatedPlan.difficulty === 5 ? 'bg-primary text-black' : 'bg-surface'"
+                                        >
+                                            Сложный
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm text-textSecondary mb-2">Фокус тренировок</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button
+                                            @click="adjustPlanFocus('physical')"
+                                            class="py-2 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                                            :class="generatedPlan.physicalIntensity > generatedPlan.cognitiveIntensity ? 'bg-primary text-black' : 'bg-surface'"
+                                        >
+                                            <i data-lucide="dumbbell" class="w-4 h-4"></i>
+                                            <span>Физический</span>
+                                        </button>
+                                        <button
+                                            @click="adjustPlanFocus('cognitive')"
+                                            class="py-2 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                                            :class="generatedPlan.cognitiveIntensity > generatedPlan.physicalIntensity ? 'bg-primary text-black' : 'bg-surface'"
+                                        >
+                                            <i data-lucide="brain" class="w-4 h-4"></i>
+                                            <span>Когнитивный</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button
+                                @click="prevStep()"
+                                class="px-6 py-3 bg-surfaceLight rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
+                            >
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                @click="nextStep()"
+                                class="px-6 py-3 bg-primary text-black font-medium rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-colors"
+                            >
+                                <span>Подтвердить план</span>
+                                <i data-lucide="check" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Plan Confirmation and Dashboard Overview -->
+                    <div
+                        x-show="currentStep === 10"
+                        x-transition:enter="animate-fade-in"
+                        x-transition:leave="animate-fade-out"
+                        class="max-w-2xl mx-auto text-center"
+                    >
+                        <div class="mb-8 flex justify-center">
+                            <div class="relative">
+                                <div class="w-24 h-24 rounded-full flex items-center justify-center bg-primary/20">
+                                    <i data-lucide="check" class="w-12 h-12 text-primary"></i>
+                                </div>
+                                <div class="absolute inset-0 rounded-full bg-primary animate-ping opacity-30"></div>
+                            </div>
+                        </div>
+
+                        <h2 class="text-2xl font-bold mb-2">Поздравляем, <span x-text="userData.name"></span>!</h2>
+                        <p class="text-textSecondary mb-8">Ваш персонализированный план тренировок успешно создан</p>
+
+                        <div class="grid grid-cols-3 gap-4 mb-8">
+                            <div class="bg-surfaceLight rounded-xl p-4 flex flex-col items-center">
+                                <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                                    <i data-lucide="calendar" class="w-6 h-6 text-primary"></i>
+                                </div>
+                                <span class="text-lg font-medium" x-text="`${generatedPlan.duration} недель`"></span>
+                                <span class="text-sm text-textSecondary">Длительность</span>
+                            </div>
+
+                            <div class="bg-surfaceLight rounded-xl p-4 flex flex-col items-center">
+                                <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                                    <i data-lucide="activity" class="w-6 h-6 text-primary"></i>
+                                </div>
+                                <span class="text-lg font-medium" x-text="`${generatedPlan.sessionsPerWeek}x`"></span>
+                                <span class="text-sm text-textSecondary">Тренировок в неделю</span>
+                            </div>
+
+                            <div class="bg-surfaceLight rounded-xl p-4 flex flex-col items-center">
+                                <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                                    <i data-lucide="zap" class="w-6 h-6 text-primary"></i>
+                                </div>
+                                <span class="text-lg font-medium" x-text="generatedPlan.level"></span>
+                                <span class="text-sm text-textSecondary">Уровень</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-surfaceLight rounded-xl p-5 mb-8 text-left">
+                            <h3 class="font-medium mb-4">Что дальше?</h3>
+
+                            <ul class="space-y-4">
+                                <li class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span>1</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Ваша первая тренировка</p>
+                                        <p class="text-sm text-textSecondary">Начнется завтра в удобное для вас время. Не забудьте подготовить удобную одежду и воду.</p>
+                                    </div>
+                                </li>
+
+                                <li class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span>2</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Отслеживайте прогресс</p>
+                                        <p class="text-sm text-textSecondary">Мы будем анализировать ваши результаты и адаптировать программу для достижения лучших результатов.</p>
+                                    </div>
+                                </li>
+
+                                <li class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span>3</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Регулярность — ключ к успеху</p>
+                                        <p class="text-sm text-textSecondary">Для достижения наилучших результатов следуйте программе регулярно, не пропуская тренировки.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <button
+                            @click="finishOnboarding()"
+                            class="px-8 py-3 bg-primary text-black font-medium rounded-full flex items-center gap-2 mx-auto hover:scale-105 transition-transform"
+                        >
+                            <span>Перейти к тренировкам</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Achievement notification -->
+        <div
+            x-show="showAchievement"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-10"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-10"
+            class="fixed bottom-6 right-6 p-4 rounded-xl max-w-sm z-50 bg-surfaceLight bg-blur shadow-lg"
+            style="box-shadow: 0 10px 25px -5px rgba(183, 245, 1, 0.3);"
+        >
+            <div class="flex items-start gap-3">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/20">
+                    <i data-lucide="award" class="w-6 h-6 text-primary"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-textPrimary" x-text="achievementTitle"></h4>
+                    <p class="text-sm text-textSecondary" x-text="achievementDesc"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function neuronlineOnboarding() {
+            return {
+                // Add WebSocket properties
+                ws: null,
+                wsConnected: false,
+                messageQueue: [],
+                retryCount: 0,
+                maxRetries: 3,
+
+                // Add chat properties
+                messages: [],
+                currentMessage: '',
+                isTyping: false,
+
+                // Existing properties
+                currentStep: 0,
+                steps: [
+                    { id: 'landing', title: 'Добро пожаловать' },
+                    { id: 'registration', title: 'Регистрация' },
+                    { id: 'profile', title: 'Профиль' },
+                    { id: 'goals', title: 'Цели' },
+                    { id: 'equipment', title: 'Оборудование' },
+                    { id: 'schedule', title: 'Расписание' },
+                    { id: 'neurotesting', title: 'Нейротестирование' },
+                    { id: 'cognitive-profile', title: 'Когнитивный профиль' },
+                    { id: 'plan-generation', title: 'Генерация плана' },
+                    { id: 'plan-review', title: 'Просмотр плана' },
+                    { id: 'dashboard', title: 'Готово' }
+                ],
+
+                // User data
+                userData: {
+                    email: '',
+                    name: '',
+                    password: '',
+                    age: '',
+                    gender: '',
+                    height: '',
+                    weight: '',
+                    goals: [],
+                    equipment: [],
+                    trainingDays: [],
+                    preferredTime: ''
+                },
+
+                // UI state
+                showPassword: false,
+                showAchievement: false,
+                achievementTitle: '',
+                achievementDesc: '',
+
+                // Fitness goals
+                fitnessGoals: [
+                    {
+                        id: 'cognitive',
+                        name: 'Улучшение когнитивных функций',
+                        description: 'Тренировки для улучшения работы мозга, памяти и концентрации',
+                        icon: 'brain'
+                    },
+                    {
+                        id: 'physical',
+                        name: 'Физическая форма',
+                        description: 'Упражнения для улучшения физической формы и силы',
+                        icon: 'dumbbell'
+                    },
+                    {
+                        id: 'balance',
+                        name: 'Баланс и координация',
+                        description: 'Программа для развития равновесия и координации движений',
+                        icon: 'activity'
+                    },
+                    {
+                        id: 'stress',
+                        name: 'Снижение стресса',
+                        description: 'Техники для снижения стресса и улучшения эмоционального состояния',
+                        icon: 'heart'
+                    },
+                    {
+                        id: 'energy',
+                        name: 'Повышение энергии',
+                        description: 'Тренировки для повышения энергии и жизненного тонуса',
+                        icon: 'zap'
+                    }
+                ],
+
+                // Equipment options
+                equipmentOptions: [
+                    { id: 'none', name: 'Без оборудования', icon: 'user' },
+                    { id: 'dumbbells', name: 'Гантели', icon: 'dumbbell' },
+                    { id: 'resistance-bands', name: 'Эспандеры', icon: 'git-branch' },
+                    { id: 'yoga-mat', name: 'Коврик для йоги', icon: 'square' },
+                    { id: 'fitness-ball', name: 'Фитбол', icon: 'circle' },
+                    { id: 'kettlebell', name: 'Гири', icon: 'package' }
+                ],
+
+                // Time slots
+                timeSlots: [
+                    { id: 'morning', label: 'Утро (6-9)', icon: 'sunrise' },
+                    { id: 'day', label: 'День (10-16)', icon: 'sun' },
+                    { id: 'evening', label: 'Вечер (17-21)', icon: 'sunset' }
+                ],
+
+                // Neurotesting
+                neuroCognitiveTests: [
+                    {
+                        id: 'memory',
+                        name: 'Тест памяти',
+                        description: 'Оценка визуальной памяти и запоминания последовательностей',
+                        icon: 'brain',
+                        color: 'accent2',
+                        completed: false,
+                        score: 0
+                    },
+                    {
+                        id: 'reaction',
+                        name: 'Тест реакции',
+                        description: 'Измерение скорости реакции и координации',
+                        icon: 'zap',
+                        color: 'accent3',
+                        completed: false,
+                        score: 0
+                    },
+                    {
+                        id: 'focus',
+                        name: 'Тест концентрации',
+                        description: 'Оценка способности к концентрации внимания',
+                        icon: 'eye',
+                        color: 'accent1',
+                        completed: false,
+                        score: 0
+                    }
+                ],
+
+                // Test state
+                testActive: false,
+                currentTest: null,
+                testPhase: 'instruction',
+                testScore: 0,
+                testTimeRemaining: 0,
+                testInterval: null,
+
+                // Memory test
+                memorySequence: [],
+                currentMemoryStep: 0,
+                highlightedTile: -1,
+                userSequence: [],
+
+                // Reaction test
+                reactionTargets: [],
+
+                // Focus test
+                focusTargetX: 0,
+                focusTargetY: 0,
+                focusTargetHighlighted: false,
+                focusInterval: null,
+
+                // Plan generation
+                planGenerationStep: 0,
+                planGenerationInterval: null,
+
+                // Generated plan
+                generatedPlan: {
+                    name: '',
+                    description: '',
+                    duration: 0,
+                    sessionsPerWeek: 0,
+                    workoutDuration: 0,
+                    level: '',
+                    physicalIntensity: 0,
+                    cognitiveIntensity: 0,
+                    difficulty: 0,
+                    features: [],
+                    sampleExercises: []
+                },
+
+                init() {
+                    // Initialize Lucide icons
+                    lucide.createIcons();
+
+                    // Initialize WebSocket connection
+                    this.connectWebSocket();
+                },
+
+                connectWebSocket() {
+                    try {
+                        this.ws = new WebSocket('ws://localhost:3000/ws');
+
+                        this.ws.onopen = () => {
+                            this.wsConnected = true;
+                            this.retryCount = 0;
+                            console.log('WebSocket connected');
+
+                            // Send any queued messages
+                            while (this.messageQueue.length > 0) {
+                                const msg = this.messageQueue.shift();
+                                this.sendMessage(msg);
+                            }
+                        };
+
+                        this.ws.onmessage = (event) => {
+                            const data = JSON.parse(event.data);
+                            if (data.type === 'message') {
+                                this.handleBotResponse(data.content);
+                            }
+                        };
+
+                        this.ws.onclose = () => {
+                            this.wsConnected = false;
+                            console.log('WebSocket closed');
+
+                            // Attempt to reconnect
+                            if (this.retryCount < this.maxRetries) {
+                                this.retryCount++;
+                                setTimeout(() => this.connectWebSocket(), 1000 * this.retryCount);
+                            }
+                        };
+
+                        this.ws.onerror = (error) => {
+                            console.error('WebSocket error:', error);
+                        };
+                    } catch (error) {
+                        console.error('WebSocket connection error:', error);
+                    }
+                },
+
+                sendMessage(message) {
+                    if (this.wsConnected && this.ws) {
+                        if (typeof message === 'string') {
+                            this.ws.send(JSON.stringify({
+                                type: 'message',
+                                content: message
+                            }));
+                        } else {
+                            this.ws.send(JSON.stringify(message));
+                        }
+                    } else {
+                        this.messageQueue.push(message);
+                    }
+                },
+
+                handleBotResponse(response) {
+                    this.isTyping = false;
+                    if (response.type === 'error') {
+                        console.error('Bot error:', response.content);
+                        return;
+                    }
+
+                    if (response.type === 'plan') {
+                        // Handle plan response
+                        try {
+                            const planData = JSON.parse(response.content);
+                            this.generatedPlan = {
+                                ...this.generatedPlan,
+                                ...planData
+                            };
+                        } catch (e) {
+                            console.error('Error parsing plan data:', e);
+                        }
+                    } else {
+                        // Handle regular message
+                        this.messages.push({
+                            type: 'bot',
+                            content: response.content
+                        });
+                    }
+                },
+
+                // Navigation
+                nextStep() {
+                    if (this.currentStep < this.steps.length - 1) {
+                        this.currentStep++;
+
+                        // Send step information to Writer API
+                        const stepInfo = {
+                            step: this.currentStep,
+                            userData: this.userData
+                        };
+                        this.sendMessage(JSON.stringify(stepInfo));
+
+                        // Special handling for certain steps
+                        if (this.currentStep === 8) {
+                            this.startPlanGeneration();
+                        }
+
+                        // Show achievements for completing steps
+                        this.showStepAchievement();
+
+                        // Re-initialize Lucide icons after DOM update
+                        setTimeout(() => {
+                            lucide.createIcons();
+                        }, 100);
+                    }
+                },
+
+                prevStep() {
+                    if (this.currentStep > 0) {
+                        this.currentStep--;
+
+                        // Re-initialize Lucide icons after DOM update
+                        setTimeout(() => {
+                            lucide.createIcons();
+                        }, 100);
+                    }
+                },
+
+                // Show achievement notification for completing steps
+                showStepAchievement() {
+                    let title = '';
+                    let desc = '';
+
+                    switch (this.currentStep) {
+                        case 1:
+                            title = 'Добро пожаловать!';
+                            desc = 'Начинаем путешествие в мир нейрофитнеса';
+                            break;
+                        case 2:
+                            title = 'Аккаунт создан!';
+                            desc = 'Теперь создадим ваш персональный профиль';
+                            break;
+                        case 3:
+                            title = 'Профиль создан!';
+                            desc = 'Теперь выберем ваши цели тренировок';
+                            break;
+                        case 7:
+                            title = 'Нейротестирование завершено!';
+                            desc = 'Ваш когнитивный профиль сформирован';
+                            break;
+                        case 10:
+                            title = 'План создан!';
+                            desc = 'Ваш персонализированный план тренировок готов';
+                            break;
+                    }
+
+                    if (title) {
+                        this.showAchievementNotification(title, desc);
+                    }
+                },
+
+                showAchievementNotification(title, desc) {
+                    this.achievementTitle = title;
+                    this.achievementDesc = desc;
+                    this.showAchievement = true;
+
+                    setTimeout(() => {
+                        this.showAchievement = false;
+                    }, 4000);
+                },
+
+                // Toggle password visibility
+                togglePasswordVisibility() {
+                    this.showPassword = !this.showPassword;
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                // Toggle goal selection
+                toggleGoal(goalId) {
+                    const index = this.userData.goals.indexOf(goalId);
+                    if (index === -1) {
+                        this.userData.goals.push(goalId);
+                    } else {
+                        this.userData.goals.splice(index, 1);
+                    }
+                },
+
+                // Toggle equipment selection
+                toggleEquipment(equipmentId) {
+                    const index = this.userData.equipment.indexOf(equipmentId);
+                    if (index === -1) {
+                        this.userData.equipment.push(equipmentId);
+                    } else {
+                        this.userData.equipment.splice(index, 1);
+                    }
+                },
+
+                // Toggle training day selection
+                toggleTrainingDay(dayIndex) {
+                    const index = this.userData.trainingDays.indexOf(dayIndex);
+                    if (index === -1) {
+                        this.userData.trainingDays.push(dayIndex);
+                    } else {
+                        this.userData.trainingDays.splice(index, 1);
+                    }
+                },
+
+                // Neurotesting
+                startTest(testId) {
+                    this.testActive = true;
+                    this.currentTest = this.neuroCognitiveTests.find(test => test.id === testId);
+                    this.testPhase = 'instruction';
+                    this.testScore = 0;
+                    this.testTimeRemaining = 30; // Default test time
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                cancelTest() {
+                    this.testActive = false;
+                    this.currentTest = null;
+                    this.testPhase = 'instruction';
+                    this.testScore = 0;
+
+                    if (this.testInterval) {
+                        clearInterval(this.testInterval);
+                    }
+
+                    if (this.focusInterval) {
+                        clearInterval(this.focusInterval);
+                    }
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                completeTest(score) {
+                    // Find the test in the array and update its score and completion status
+                    const testIndex = this.neuroCognitiveTests.findIndex(test => test.id === this.currentTest.id);
+                    if (testIndex !== -1) {
+                        this.neuroCognitiveTests[testIndex].completed = true;
+                        this.neuroCognitiveTests[testIndex].score = score || this.testScore;
+                    }
+
+                    // Show achievement notification
+                    this.showAchievementNotification(
+                        `Тест "${this.currentTest.name}" завершен!`,
+                        `Ваш результат: ${score || this.testScore} из 100`
+                    );
+
+                    // Reset test state
+                    this.testActive = false;
+                    this.currentTest = null;
+                    this.testPhase = 'instruction';
+
+                    if (this.testInterval) {
+                        clearInterval(this.testInterval);
+                    }
+
+                    if (this.focusInterval) {
+                        clearInterval(this.focusInterval);
+                    }
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                allTestsCompleted() {
+                    return this.neuroCognitiveTests.every(test => test.completed);
+                },
+
+                // Memory test
+                startTestSequence() {
+                    this.testPhase = 'sequence';
+                    this.memorySequence = this.generateMemorySequence();
+                    this.currentMemoryStep = 0;
+                    this.userSequence = [];
+
+                    // Show sequence to user
+                    this.highlightedTile = this.memorySequence[0];
+
+                    let step = 0;
+                    this.testInterval = setInterval(() => {
+                        if (step < this.memorySequence.length) {
+                            this.highlightedTile = this.memorySequence[step];
+                            step++;
+                        } else {
+                            clearInterval(this.testInterval);
+                            this.highlightedTile = -1;
+
+                            // After a short delay, let user repeat the sequence
+                            setTimeout(() => {
+                                this.testPhase = 'repeat';
+                                this.startTestTimer();
+                            }, 1000);
+                        }
+                    }, 1000);
+                },
+
+                generateMemorySequence() {
+                    // Generate a random sequence of 5 numbers between 0 and 8 (for a 3x3 grid)
+                    const sequence = [];
+                    for (let i = 0; i < 5; i++) {
+                        sequence.push(Math.floor(Math.random() * 9));
+                    }
+                    return sequence;
+                },
+
+                getMemoryTileClass(index) {
+                    if (this.highlightedTile === index) {
+                        return 'bg-accent2 scale-110';
+                    } else if (this.testPhase === 'repeat' && this.userSequence.includes(index)) {
+                        return 'bg-accent2/50';
+                    } else {
+                        return 'bg-surfaceLight hover:bg-surface';
+                    }
+                },
+
+                checkMemorySequence(tileIndex) {
+                    // Add user's selection to their sequence
+                    this.userSequence.push(tileIndex);
+
+                    // Check if the selection matches the current step in the sequence
+                    if (tileIndex === this.memorySequence[this.currentMemoryStep]) {
+                        this.currentMemoryStep++;
+                        this.testScore += 20; // 20 points per correct step
+
+                        // If user completed the full sequence
+                        if (this.currentMemoryStep >= this.memorySequence.length) {
+                            clearInterval(this.testInterval);
+                            this.completeTest(this.testScore);
+                        }
+                    } else {
+                        // Wrong selection
+                        this.testScore = Math.max(0, this.testScore - 10);
+
+                        // Show the correct sequence again after a short delay
+                        setTimeout(() => {
+                            this.startTestSequence();
+                        }, 1000);
+                    }
+                },
+
+                // Reaction test
+                startReactionTest() {
+                    this.testPhase = 'active';
+                    this.generateReactionTargets();
+                    this.startTestTimer();
+                },
+
+                generateReactionTargets() {
+                    this.reactionTargets = [];
+
+                    // Generate 5 targets at random positions
+                    for (let i = 0; i < 5; i++) {
+                        this.reactionTargets.push({
+                            id: i,
+                            x: Math.random() * 80 + 10, // 10-90% of container width
+                            y: Math.random() * 80 + 10, // 10-90% of container height
+                            active: true
+                        });
+                    }
+                },
+
+                hitReactionTarget(target) {
+                    // Increase score
+                    this.testScore += 10;
+
+                    // Deactivate hit target
+                    target.active = false;
+
+                    // Generate a new target
+                    this.reactionTargets.push({
+                        id: this.reactionTargets.length,
+                        x: Math.random() * 80 + 10,
+                        y: Math.random() * 80 + 10,
+                        active: true
+                    });
+                },
+
+                // Focus test
+                startFocusTest() {
+                    this.testPhase = 'active';
+                    this.focusTargetX = 0;
+                    this.focusTargetY = 0;
+                    this.focusTargetHighlighted = false;
+
+                    // Move target randomly
+                    this.focusInterval = setInterval(() => {
+                        this.focusTargetX = (Math.random() * 200) - 100;
+                        this.focusTargetY = (Math.random() * 200) - 100;
+
+                        // Randomly highlight target
+                        if (Math.random() < 0.3) {
+                            this.focusTargetHighlighted = true;
+
+                            // Automatically unhighlight after a short time if user doesn't click
+                            setTimeout(() => {
+                                if (this.focusTargetHighlighted) {
+                                    this.focusTargetHighlighted = false;
+                                    this.testScore = Math.max(0, this.testScore - 5); // Penalty for missing
+                                }
+                            }, 1000);
+                        } else {
+                            this.focusTargetHighlighted = false;
+                        }
+                    }, 1500);
+
+                    this.startTestTimer();
+                },
+
+                checkFocusTarget() {
+                    if (this.focusTargetHighlighted) {
+                        // Correct click
+                        this.testScore += 15;
+                        this.focusTargetHighlighted = false;
+                    } else {
+                        // Incorrect click
+                        this.testScore = Math.max(0, this.testScore - 10);
+                    }
+                },
+
+                // Test timer
+                startTestTimer() {
+                    this.testTimeRemaining = 30;
+
+                    if (this.testInterval) {
+                        clearInterval(this.testInterval);
+                    }
+
+                    this.testInterval = setInterval(() => {
+                        this.testTimeRemaining--;
+
+                        if (this.testTimeRemaining <= 0) {
+                            clearInterval(this.testInterval);
+
+                            // Calculate final score (ensure it's between 0-100)
+                            const finalScore = Math.min(100, Math.max(0, this.testScore));
+                            this.completeTest(finalScore);
+                        }
+                    }, 1000);
+                },
+
+                // Cognitive profile
+                getAverageTestScore() {
+                    const completedTests = this.neuroCognitiveTests.filter(test => test.completed);
+                    if (completedTests.length === 0) return 0;
+
+                    const sum = completedTests.reduce((total, test) => total + test.score, 0);
+                    return sum / completedTests.length;
+                },
+
+                getCognitiveLevel() {
+                    const avgScore = this.getAverageTestScore();
+
+                    if (avgScore >= 85) return 'Продвинутый';
+                    if (avgScore >= 70) return 'Выше среднего';
+                    if (avgScore >= 50) return 'Средний';
+                    return 'Начальный';
+                },
+
+                getCognitiveRecommendations() {
+                    const recommendations = [];
+
+                    // Memory recommendations
+                    const memoryTest = this.neuroCognitiveTests.find(test => test.id === 'memory');
+                    if (memoryTest && memoryTest.completed) {
+                        if (memoryTest.score < 70) {
+                            recommendations.push('Включите в тренировки упражнения на визуальную память и запоминание последовательностей для улучшения когнитивных функций.');
+                        }
+                    }
+
+                    // Reaction recommendations
+                    const reactionTest = this.neuroCognitiveTests.find(test => test.id === 'reaction');
+                    if (reactionTest && reactionTest.completed) {
+                        if (reactionTest.score < 70) {
+                            recommendations.push('Рекомендуются упражнения на скорость реакции и координацию для улучшения нейромышечной связи.');
+                        }
+                    }
+
+                    // Focus recommendations
+                    const focusTest = this.neuroCognitiveTests.find(test => test.id === 'focus');
+                    if (focusTest && focusTest.completed) {
+                        if (focusTest.score < 70) {
+                            recommendations.push('Добавьте в программу упражнения на концентрацию внимания для улучшения когнитивной выносливости.');
+                        }
+                    }
+
+                    // General recommendations
+                    const avgScore = this.getAverageTestScore();
+                    if (avgScore < 50) {
+                        recommendations.push('Начните с базовых нейрокогнитивных упражнений для создания прочной основы.');
+                    } else if (avgScore >= 85) {
+                        recommendations.push('Ваши показатели выше среднего. Рекомендуем сложные комплексные упражнения для дальнейшего развития.');
+                    }
+
+                    // Ensure we have at least one recommendation
+                    if (recommendations.length === 0) {
+                        recommendations.push('Ваши когнитивные показатели в норме. Рекомендуем сбалансированную программу для поддержания и улучшения результатов.');
+                    }
+
+                    return recommendations;
+                },
+
+                // Plan generation
+                startPlanGeneration() {
+                    this.planGenerationStep = 0;
+
+                    // Send user data to Writer API for plan generation
+                    const userData = {
+                        type: 'generate_plan',
+                        data: {
+                            profile: this.userData,
+                            testResults: this.neuroCognitiveTests,
+                            goals: this.userData.goals
+                        }
+                    };
+
+                    this.sendMessage(JSON.stringify(userData));
+
+                    // Simulate AI plan generation with intervals
+                    this.planGenerationInterval = setInterval(() => {
+                        this.planGenerationStep++;
+
+                        if (this.planGenerationStep >= 3) {
+                            clearInterval(this.planGenerationInterval);
+                            this.generatePlan();
+                        }
+                    }, 2000);
+                },
+
+                generatePlan() {
+                    // Generate plan based on user data and test results
+                    const avgScore = this.getAverageTestScore();
+                    const primaryGoal = this.userData.goals[0] || 'physical';
+
+                    // Determine plan level
+                    let level = 'Начальный';
+                    let difficulty = 1;
+                    if (avgScore >= 85) {
+                        level = 'Продвинутый';
+                        difficulty = 5;
+                    } else if (avgScore >= 70) {
+                        level = 'Средний';
+                        difficulty = 3;
+                    }
+
+                    // Determine focus based on primary goal
+                    let physicalIntensity = 3;
+                    let cognitiveIntensity = 3;
+                    let planName = 'Комплексная программа';
+                    let planDescription = 'Сбалансированная программа для общего развития физических и когнитивных способностей';
+
+                    switch (primaryGoal) {
+                        case 'cognitive':
+                            planName = 'Нейрокогнитивное развитие';
+                            planDescription = 'Программа с акцентом на развитие когнитивных функций, памяти и концентрации';
+                            cognitiveIntensity = 5;
+                            physicalIntensity = 2;
+                            break;
+                        case 'physical':
+                            planName = 'Физическая форма';
+                            planDescription = 'Программа с акцентом на развитие силы, выносливости и гибкости';
+                            physicalIntensity = 5;
+                            cognitiveIntensity = 2;
+                            break;
+                        case 'balance':
+                            planName = 'Баланс и координация';
+                            planDescription = 'Программа для развития равновесия, координации и проприоцепции';
+                            physicalIntensity = 4;
+                            cognitiveIntensity = 4;
+                            break;
+                        case 'stress':
+                            planName = 'Антистресс';
+                            planDescription = 'Программа для снижения стресса и улучшения эмоционального состояния';
+                            physicalIntensity = 2;
+                            cognitiveIntensity = 4;
+                            break;
+                        case 'energy':
+                            planName = 'Энергия и активность';
+                            planDescription = 'Программа для повышения энергии и жизненного тонуса';
+                            physicalIntensity = 4;
+                            cognitiveIntensity = 3;
+                            break;
+                    }
+
+                    // Set generated plan
+                    this.generatedPlan = {
+                        name: planName,
+                        description: planDescription,
+                        duration: 8,
+                        sessionsPerWeek: 3,
+                        workoutDuration: 30,
+                        level: level,
+                        physicalIntensity: physicalIntensity,
+                        cognitiveIntensity: cognitiveIntensity,
+                        difficulty: difficulty,
+                        features: [
+                            'Интеграция нейрокогнитивных упражнений с физической активностью',
+                            'Прогрессивное увеличение сложности для постоянного развития',
+                            'Персонализированный подбор упражнений на основе ваших результатов',
+                            'Адаптивная система, учитывающая ваш прогресс'
+                        ],
+                        sampleExercises: [
+                            { name: 'Нейроразминка', sets: '5 минут', icon: 'brain' },
+                            { name: 'Комплекс на баланс', sets: '3 подхода × 45 сек', icon: 'activity' },
+                            { name: 'Силовые упражнения', sets: '3 подхода × 12 повторений', icon: 'dumbbell' },
+                            { name: 'Когнитивная задача', sets: '2 подхода × 2 минуты', icon: 'zap' },
+                            { name: 'Заминка и растяжка', sets: '5 минут', icon: 'heart' }
+                        ]
+                    };
+                },
+
+                adjustPlanFocus(focus) {
+                    if (focus === 'physical') {
+                        this.generatedPlan.physicalIntensity = 5;
+                        this.generatedPlan.cognitiveIntensity = 2;
+                        this.generatedPlan.name = 'Физическая форма с элементами нейрофитнеса';
+                    } else {
+                        this.generatedPlan.physicalIntensity = 2;
+                        this.generatedPlan.cognitiveIntensity = 5;
+                        this.generatedPlan.name = 'Нейрокогнитивное развитие';
+                    }
+                },
+
+                finishOnboarding() {
+                    // In a real app, this would navigate to the dashboard
+                    this.showAchievementNotification(
+                        'Onboarding завершен!',
+                        'Добро пожаловать в Neuronline!'
+                    );
+
+                    // For demo purposes, reset to the start
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            };
+        }
+    </script>
+</body>
+</html>

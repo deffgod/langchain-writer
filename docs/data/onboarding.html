@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuronline - Платформа нейрофитнеса</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#B7F501', // Neon green
+                        background: '#0F0F0F', // Near black
+                        surface: '#1A1A1A', // Dark gray
+                        surfaceLight: '#2A2A2A', // Lighter dark gray
+                        textPrimary: '#FFFFFF', // White
+                        textSecondary: '#A0A0A0', // Light gray
+                        accent1: '#00D1FF', // Cyan
+                        accent2: '#FF00E5', // Magenta
+                        accent3: '#FF9500', // Orange
+                        success: '#00C853', // Green
+                        warning: '#FFD600', // Yellow
+                        error: '#FF5252', // Red
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        .bg-blur {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .brain-bg {
+            background: radial-gradient(circle at center, rgba(183, 245, 1, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stars {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+            box-shadow: 1744px 122px #fff, 134px 1321px #fff, 92px 859px #fff, 235px 1045px #fff, 366px 912px #fff, 491px 942px #fff, 14px 1831px #fff, 582px 476px #fff, 588px 1230px #fff, 1520px 1343px #fff, 1671px 203px #fff, 550px 341px #fff, 1491px 549px #fff, 558px 161px #fff, 896px 1823px #fff, 999px 1463px #fff, 1557px 636px #fff, 1754px 1307px #fff, 178px 1489px #fff, 1482px 571px #fff, 1123px 1831px #fff, 1377px 1331px #fff, 2000px 1665px #fff, 145px 1530px #fff, 1338px 1732px #fff, 1372px 735px #fff, 1658px 1139px #fff, 578px 1914px #fff, 1096px 1951px #fff, 643px 1562px #fff, 1633px 1257px #fff, 1133px 1952px #fff, 1538px 1155px #fff, 1108px 1042px #fff, 1281px 1822px #fff, 966px 1746px #fff, 934px 938px #fff, 1438px 1186px #fff, 355px 1542px #fff, 1845px 178px #fff, 837px 1753px #fff, 373px 1877px #fff, 1544px 1705px #fff, 106px 1308px #fff, 1334px 1277px #fff, 1611px 1599px #fff, 1212px 537px #fff, 214px 582px #fff, 1857px 1074px #fff, 1707px 1812px #fff;
+            animation: animStar 50s linear infinite;
+        }
+
+        @keyframes animStar {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-2000px); }
+        }
+    </style>
+</head>
+<body class="bg-background text-textPrimary min-h-screen">
+    <div class="stars"></div>
+
+    <div x-data="neuronlineApp()" x-cloak>
+        <!-- Header steps indicator -->
+        <div
+            x-show="currentStep > 0"
+            class="fixed top-0 left-0 right-0 z-10 py-4 px-6 bg-surface/80 bg-blur"
+        >
+            <div class="flex justify-between items-center max-w-5xl mx-auto">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-primary">
+                        <i data-lucide="brain" class="w-4 h-4 text-black"></i>
+                    </div>
+                    <span class="font-bold text-textPrimary">Neuronline</span>
+                </div>
+
+                <div class="hidden md:flex items-center gap-2">
+                    <template x-for="(step, idx) in steps" :key="idx">
+                        <div
+                            class="w-8 h-1 rounded-full transition-colors duration-300"
+                            :class="idx === currentStep ? 'pulse' : ''"
+                            :style="idx <= currentStep ? 'background-color: #B7F501' : 'background-color: #2A2A2A'"
+                        ></div>
+                    </template>
+                </div>
+
+                <div class="text-textSecondary">
+                    Шаг <span x-text="currentStep"></span> из <span x-text="steps.length - 1"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main container -->
+        <div :class="currentStep > 0 ? 'pt-24 pb-16' : ''" class="container mx-auto p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <!-- 3D Model column (simplified with SVG/images for Alpine.js version) -->
+                <div class="hidden md:block relative">
+                    <div class="h-[500px] relative brain-bg flex items-center justify-center">
+                        <!-- Brain visualization -->
+                        <div x-show="getCurrentModelType() === 'brain'" class="floating">
+                            <svg width="300" height="300" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 20C55.8172 20 20 55.8172 20 100C20 144.183 55.8172 180 100 180C144.183 180 180 144.183 180 100C180 55.8172 144.183 20 100 20Z" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M60 80C60 63.4315 73.4315 50 90 50C106.569 50 120 63.4315 120 80C120 96.5685 106.569 110 90 110" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M140 80C140 63.4315 126.569 50 110 50C93.4315 50 80 63.4315 80 80C80 96.5685 93.4315 110 110 110" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M60 120C60 136.569 73.4315 150 90 150C106.569 150 120 136.569 120 120C120 103.431 106.569 90 90 90" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M140 120C140 136.569 126.569 150 110 150C93.4315 150 80 136.569 80 120C80 103.431 93.4315 90 110 90" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M90 50C90 50 70 65 70 100C70 135 90 150 90 150" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M110 50C110 50 130 65 130 100C130 135 110 150 110 150" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="65" cy="75" r="3" fill="#B7F501" fill-opacity="0.5"/>
+                                <circle cx="135" cy="75" r="3" fill="#B7F501" fill-opacity="0.5"/>
+                                <circle cx="75" cy="125" r="3" fill="#B7F501" fill-opacity="0.5"/>
+                                <circle cx="125" cy="125" r="3" fill="#B7F501" fill-opacity="0.5"/>
+                                <circle cx="100" cy="100" r="5" fill="#B7F501" fill-opacity="0.7"/>
+                            </svg>
+                        </div>
+
+                        <!-- Human figure visualization -->
+                        <div x-show="getCurrentModelType() === 'human'" class="floating">
+                            <svg width="200" height="300" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="30" r="20" fill="#4a6fa0"/>
+                                <rect x="40" y="50" width="20" height="60" rx="10" fill="#4a6fa0"/>
+                                <rect x="15" y="60" width="15" height="40" rx="7.5" transform="rotate(-30 15 60)" fill="#4a6fa0"/>
+                                <rect x="70" y="60" width="15" height="40" rx="7.5" transform="rotate(30 70 60)" fill="#4a6fa0"/>
+                                <rect x="35" y="110" width="15" height="50" rx="7.5" transform="rotate(-10 35 110)" fill="#4a6fa0"/>
+                                <rect x="55" y="110" width="15" height="50" rx="7.5" transform="rotate(10 55 110)" fill="#4a6fa0"/>
+                            </svg>
+                        </div>
+
+                        <!-- Both visualization -->
+                        <div x-show="getCurrentModelType() === 'both'" class="flex justify-around w-full">
+                            <div class="floating" style="animation-delay: -2s;">
+                                <svg width="150" height="150" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M100 20C55.8172 20 20 55.8172 20 100C20 144.183 55.8172 180 100 180C144.183 180 180 144.183 180 100C180 55.8172 144.183 20 100 20Z" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M60 80C60 63.4315 73.4315 50 90 50C106.569 50 120 63.4315 120 80C120 96.5685 106.569 110 90 110" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M140 80C140 63.4315 126.569 50 110 50C93.4315 50 80 63.4315 80 80C80 96.5685 93.4315 110 110 110" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M60 120C60 136.569 73.4315 150 90 150C106.569 150 120 136.569 120 120C120 103.431 106.569 90 90 90" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M140 120C140 136.569 126.569 150 110 150C93.4315 150 80 136.569 80 120C80 103.431 93.4315 90 110 90" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="floating" style="animation-delay: -1s;">
+                                <svg width="120" height="180" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="50" cy="30" r="20" fill="#4a6fa0"/>
+                                    <rect x="40" y="50" width="20" height="60" rx="10" fill="#4a6fa0"/>
+                                    <rect x="15" y="60" width="15" height="40" rx="7.5" transform="rotate(-30 15 60)" fill="#4a6fa0"/>
+                                    <rect x="70" y="60" width="15" height="40" rx="7.5" transform="rotate(30 70 60)" fill="#4a6fa0"/>
+                                    <rect x="35" y="110" width="15" height="50" rx="7.5" transform="rotate(-10 35 110)" fill="#4a6fa0"/>
+                                    <rect x="55" y="110" width="15" height="50" rx="7.5" transform="rotate(10 55 110)" fill="#4a6fa0"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content column -->
+                <div>
+                    <!-- Welcome Step -->
+                    <div x-show="currentStep === 0" class="text-center max-w-md mx-auto space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent1">
+                                Neuronline
+                            </h1>
+                            <p class="text-xl mt-2 text-textPrimary">
+                                Платформа нейрофитнеса нового поколения
+                            </p>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-textSecondary">
+                                Объединяем тренировки для мозга и тела в уникальный подход к фитнесу,
+                                основанный на нейрофизиологии и когнитивной науке
+                            </p>
+                        </div>
+
+                        <div class="flex justify-center pt-4">
+                            <button
+                                class="px-8 py-3 rounded-full flex items-center gap-2 text-black font-medium transition-transform hover:scale-105 bg-primary"
+                                @click="goToNextStep()"
+                            >
+                                <span>Начать</span>
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Profile Step -->
+                    <div x-show="currentStep === 1" class="max-w-lg mx-auto">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-textPrimary">
+                                Создайте свой профиль
+                            </h2>
+                            <p class="text-textSecondary">
+                                Эти данные помогут нам персонализировать программу тренировок
+                            </p>
+                        </div>
+
+                        <div class="space-y-6 backdrop-blur-lg bg-black/30 p-6 rounded-xl">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-sm text-textSecondary">Имя</label>
+                                    <input
+                                        type="text"
+                                        x-model="userData.name"
+                                        class="w-full px-3 py-2 rounded-lg text-white bg-surfaceLight"
+                                        placeholder="Ваше имя"
+                                    />
+                                </div>
+
+                                <div class="space-y-2">
+                                    <label class="text-sm text-textSecondary">Возраст</label>
+                                    <input
+                                        type="number"
+                                        x-model="userData.age"
+                                        min="14"
+                                        max="90"
+                                        class="w-full px-3 py-2 rounded-lg text-white bg-surfaceLight"
+                                        placeholder="Лет"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm text-textSecondary">Пол</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <template x-for="gender in ['male', 'female', 'other']" :key="gender">
+                                        <button
+                                            class="px-4 py-2 rounded-lg transition-colors"
+                                            :class="userData.gender === gender ? 'bg-primary text-black' : 'bg-surfaceLight text-textPrimary'"
+                                            @click="userData.gender = gender"
+                                        >
+                                            <span x-text="gender === 'male' ? 'Мужской' : gender === 'female' ? 'Женский' : 'Другой'"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-sm text-textSecondary">Рост (см)</label>
+                                    <input
+                                        type="number"
+                                        x-model="userData.height"
+                                        min="120"
+                                        max="220"
+                                        class="w-full px-3 py-2 rounded-lg text-white bg-surfaceLight"
+                                        placeholder="см"
+                                    />
+                                </div>
+
+                                <div class="space-y-2">
+                                    <label class="text-sm text-textSecondary">Вес (кг)</label>
+                                    <input
+                                        type="number"
+                                        x-model="userData.weight"
+                                        min="30"
+                                        max="200"
+                                        class="w-full px-3 py-2 rounded-lg text-white bg-surfaceLight"
+                                        placeholder="кг"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm text-textSecondary">Уровень подготовки</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <template x-for="level in experienceLevels" :key="level.id">
+                                        <button
+                                            class="p-3 rounded-lg transition-colors text-center h-full flex flex-col items-center justify-center"
+                                            :class="userData.experience === level.id ? 'border border-primary bg-primary/20' : 'bg-surfaceLight border border-transparent'"
+                                            @click="userData.experience = level.id"
+                                        >
+                                            <span class="font-medium" x-text="level.name"></span>
+                                            <span class="text-xs mt-1 text-textSecondary" x-text="level.description"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-6">
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 bg-surfaceLight text-textPrimary"
+                                @click="goToPrevStep()"
+                            >
+                                <i data-lucide="arrow-right" class="w-4 h-4 rotate-180"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 text-black font-medium"
+                                :class="canContinueFromProfile() ? 'bg-primary opacity-100' : 'bg-primary/50 opacity-70'"
+                                @click="validateAndContinue()"
+                                :disabled="!canContinueFromProfile()"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Goals Step -->
+                    <div x-show="currentStep === 2" class="max-w-lg mx-auto">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-textPrimary">
+                                Выберите основную цель
+                            </h2>
+                            <p class="text-textSecondary">
+                                Это поможет нам сформировать программу, соответствующую вашим приоритетам
+                            </p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <template x-for="(goal, index) in availableGoals" :key="goal.id">
+                                <div
+                                    class="p-4 rounded-xl cursor-pointer flex items-center transition-transform hover:scale-102"
+                                    :class="userData.goal === goal.id ? `border border-${goal.color} bg-${goal.color}/15` : 'bg-surfaceLight border border-transparent'"
+                                    @click="userData.goal = goal.id"
+                                >
+                                    <div
+                                        class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+                                        :class="userData.goal === goal.id ? `bg-${goal.color} text-black` : `bg-${goal.color}/30 text-${goal.color}`"
+                                    >
+                                        <i :data-lucide="goal.icon" class="w-6 h-6"></i>
+                                    </div>
+
+                                    <div class="flex-1">
+                                        <h3 class="font-medium text-textPrimary" x-text="goal.name"></h3>
+                                        <p class="text-sm text-textSecondary" x-text="goal.description"></p>
+                                    </div>
+
+                                    <div
+                                        class="w-6 h-6 rounded-full flex items-center justify-center"
+                                        :class="userData.goal === goal.id ? `bg-${goal.color}` : 'border-2 border-textSecondary'"
+                                    >
+                                        <i x-show="userData.goal === goal.id" data-lucide="check" class="w-4 h-4 text-white"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="flex justify-between mt-6">
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 bg-surfaceLight text-textPrimary"
+                                @click="goToPrevStep()"
+                            >
+                                <i data-lucide="arrow-right" class="w-4 h-4 rotate-180"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 text-black font-medium"
+                                :class="userData.goal ? 'bg-primary opacity-100' : 'bg-primary/50 opacity-70'"
+                                @click="validateAndContinue()"
+                                :disabled="!userData.goal"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Neurotesting Step -->
+                    <div x-show="currentStep === 3" class="max-w-lg mx-auto">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-textPrimary">
+                                Нейротестирование
+                            </h2>
+                            <p class="text-textSecondary">
+                                Пройдите серию тестов для оценки ваших когнитивных и физических показателей
+                            </p>
+                        </div>
+
+                        <div x-show="testActive" class="relative">
+                            <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 z-10">
+                                <i data-lucide="clock" class="w-4 h-4 text-primary"></i>
+                                <span class="text-textPrimary">
+                                    <span x-text="testTime"></span>с / <span x-text="getCurrentTestDuration()"></span>с
+                                </span>
+                            </div>
+
+                            <div class="absolute top-4 left-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 z-10">
+                                <i data-lucide="target" class="w-4 h-4 text-primary"></i>
+                                <span class="text-textPrimary">Тест: <span x-text="getCurrentTestName()"></span></span>
+                            </div>
+
+                            <div class="h-[400px] bg-black/20 backdrop-blur-md rounded-xl overflow-hidden relative flex items-center justify-center">
+                                <!-- Test visualization area -->
+                                <div x-show="testType === 'vestibular'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Осознание себя в пространстве</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Встаньте прямо, поставьте одну ногу перед другой (пятка к носку), закройте глаза и попробуйте удержать равновесие в течение 10 секунд.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('vestibular', '1. Стою уверенно ')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Стою уверенно
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('vestibular', '2. Сложнее на левой ноге (сзади)')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Сложнее на левой ноге (сзади)
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('vestibular', '3. Сложнее на правой ноге (сзади)')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Сложнее на правой ноге (сзади)
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('vestibular', '4. Неустойчиво в обоих случаях')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            4. Неустойчиво в обоих случаях
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'flexibility'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Наклон</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Встаньте прямо, ноги вместе. Наклонитесь вперед и попробуйте дотянуться пальцами до пола. Оцените свой результат.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('flexibility', '1.Пальцы на уровне колен')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Пальцы на уровне колен
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('flexibility', '2.Пальцы на уровне середины голени')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Пальцы на уровне середины голени
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('flexibility', '3.Пальцы у голеностопа')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Пальцы у голеностопа
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('flexibility', '4. Пальцы на полу')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            4. Пальцы на полу
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('flexibility', '5. Ладонь на полу')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            5. Ладонь на полу
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'breathing'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Задержка дыхания на выдохе в шаге</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Сделайте обычный выдох и начните шагать на месте, считая шаги. Шагайте до тех пор, пока не почувствуете желание сделать вдох. Запишите количество шагов.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('breathing', '1. До 40 шагов')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. До 40 шагов
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('breathing', '2. От 60 до 80 шагов')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. От 60 до 80 шагов
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('breathing', '3. Больше 80 шагов')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Больше 80 шагов
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'diaphragm'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Тест на работу диафрагмы</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Лягте на спину, положите руку на живот. Сделайте глубокий вдох и выдох. Измерьте разницу между положением руки на вдохе и выдохе.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('diaphragm', '1. До 3 см')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. До 3 см
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('diaphragm', '2. От 3 до 5 см')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. От 3 до 5 см
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('diaphragm', '3. От 5 см и больше')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. От 5 см и больше
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'pelvic'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Надуваем воздушный шарик</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Надуйте воздушный шарик и обратите внимание на ощущения в области промежности. Что вы чувствуете?
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('pelvic', '1. Распирание и натуживание')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Распирание и натуживание
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('pelvic', '2. Подтягивание ')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Подтягивание
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('pelvic', '3. Ничего')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Ничего
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'vision'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Острота зрения</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Посмотрите на таблицу для проверки зрения с расстояния 3 метров. Закройте поочередно каждый глаз и оцените, как вы видите.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('vision', '1.Вижу все строчки двумя глазами')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Вижу все строчки двумя глазами
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('vision', '2. Правый глаз видит хуже левого')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Правый глаз видит хуже левого
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('vision', '3. Левый глаз видит хуже правого')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Левый глаз видит хуже правого
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('vision', '4. Оба глаза не видят нижние строчки')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            4. Оба глаза не видят нижние строчки
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'eyeConvergence'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Сведение/Разведение глаз</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Поднесите палец к переносице, следя за ним взглядом. Оцените, как двигаются ваши глаза.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('eyeConvergence', '1. Глаза двигаются синхронно')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Глаза двигаются синхронно
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('eyeConvergence', '2.Правый глаз двигается хуже (либо не двигается совсем)')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Правый глаз двигается хуже (либо не двигается совсем)
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('eyeConvergence', '3. Левый глаз двигается хуже (либо не двигается совсем)')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Левый глаз двигается хуже (либо не двигается совсем)
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('eyeConvergence', '4. Глаза не соединяются/не разводятся')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            4. Глаза не соединяются/не разводятся
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'eyeHand'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Тест "глаза-рука"</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Бросьте мяч в цель 20 раз правой рукой и 20 раз левой рукой. Оцените свою точность.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('eyeHand', '1. 20 из 20 на обе руки')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. 20 из 20 на обе руки
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('eyeHand', '2. Правая ошибалась чаще левой')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Правая ошибалась чаще левой
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('eyeHand', '3. Левая ошибалась чаще правой')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Левая ошибалась чаще правой
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('eyeHand', '4. Было сложно на обе руки')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            4. Было сложно на обе руки
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'dominantEye'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Ведущий глаз</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Вытяните руку вперед и поднимите большой палец. Зафиксируйте взгляд на нём двумя глазами, затем закройте поочередно каждый глаз. Что происходит с изображением?
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('dominantEye', '1. Объект остался на месте, вижу одинаково двумя глазами.')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Объект остался на месте, вижу одинаково двумя глазами
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('dominantEye', '2. Изображение съехало, когда смотрю одним глазом')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Изображение съехало, когда смотрю одним глазом
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'smell'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Распознавание запаха</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Закройте один глаз и попробуйте определить запах (например, кофе, цитрусовые или эфирное масло). Повторите с другой ноздрей.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('smell', '1. чувствую аромат сразу и узнаю его')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Чувствую аромат сразу и узнаю его
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('smell', '2. не ощущаю правой')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Не ощущаю правой ноздрей
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('smell', '3. не ощущаю левой')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Не ощущаю левой ноздрей
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('smell', '4. не чувствую двумя')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            4. Не чувствую обеими ноздрями
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'stroop'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">СТРУП-тест</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Прочитайте вслух названия цветов, а не сами цвета, которыми написаны слова. Засеките время выполнения.
+                                        </p>
+                                        <div class="grid grid-cols-4 gap-2 mt-4 max-w-sm mx-auto">
+                                            <div class="p-2 text-red-500">СИНИЙ</div>
+                                            <div class="p-2 text-green-500">КРАСНЫЙ</div>
+                                            <div class="p-2 text-blue-500">ЗЕЛЕНЫЙ</div>
+                                            <div class="p-2 text-yellow-500">ЧЕРНЫЙ</div>
+                                            <div class="p-2 text-purple-500">ЖЕЛТЫЙ</div>
+                                            <div class="p-2 text-red-500">ЗЕЛЕНЫЙ</div>
+                                            <div class="p-2 text-blue-500">КРАСНЫЙ</div>
+                                            <div class="p-2 text-green-500">СИНИЙ</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('stroop', '1. Меньше 1  минуты')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Меньше 1 минуты
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('stroop', '2. От 1 до 1,30 мин')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. От 1 до 1,30 мин
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('stroop', '3. от 1.30 мин')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. От 1.30 мин
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div x-show="testType === 'pulse'" class="relative w-full h-full flex flex-col items-center justify-center">
+                                    <div class="text-center mb-8">
+                                        <h3 class="text-xl font-medium mb-2">Ортостатическая проба</h3>
+                                        <p class="text-textSecondary max-w-md mx-auto">
+                                            Измерьте пульс лежа в течение 1 минуты. Затем встаньте и снова измерьте пульс. Вычислите разницу.
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col space-y-3 w-full max-w-md">
+                                        <button
+                                            @click="selectTestAnswer('pulse', '1. Увеличение пульса после подъема  \nОт 0 до +10 уд/мин')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            1. Увеличение пульса после подъема от 0 до +10 уд/мин
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('pulse', '2. Увеличение пульса после подъема  От +11 до +16 уд/мин \n')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            2. Увеличение пульса после подъема от +11 до +16 уд/мин
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('pulse', '3.Увеличение пульса после подъема  От +17 до + 22 уд/мин')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            3. Увеличение пульса после подъема от +17 до +22 уд/мин
+                                        </button>
+                                        <button
+                                            @click="selectTestAnswer('pulse', '4. Снижение пульса от -2 уд/мин')"
+                                            class="p-3 rounded-lg bg-surfaceLight hover:bg-primary/20 text-left"
+                                        >
+                                            4. Снижение пульса от -2 уд/мин
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                class="mt-4 px-4 py-2 rounded-lg flex items-center gap-2 mx-auto bg-surfaceLight text-textPrimary"
+                                @click="cancelTest()"
+                            >
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                <span>Отменить тест</span>
+                            </button>
+                        </div>
+
+                        <div x-show="!testActive" class="space-y-4">
+                            <template x-for="(test, index) in neuroTests" :key="test.id">
+                                <div
+                                    class="p-4 rounded-xl flex items-center"
+                                    :class="testResults[test.id] ? `border border-${test.color} bg-${test.color}/15` : 'bg-surfaceLight'"
+                                >
+                                    <div
+                                        class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+                                        :class="`bg-${test.color}/20 text-${test.color}`"
+                                    >
+                                        <i :data-lucide="test.icon" class="w-6 h-6"></i>
+                                    </div>
+
+                                    <div class="flex-1">
+                                        <h3 class="font-medium text-textPrimary" x-text="test.name"></h3>
+                                        <p class="text-sm text-textSecondary">
+                                            <span x-text="test.description"></span>
+                                        </p>
+                                    </div>
+
+                                    <div x-show="testResults[test.id]" class="bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full">
+                                        <span class="text-sm text-textSecondary">Пройден</span>
+                                    </div>
+
+                                    <button
+                                        x-show="!testResults[test.id]"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium"
+                                        :class="`bg-${test.color} text-black`"
+                                        @click="startTest(test.id)"
+                                    >
+                                        Пройти тест
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="flex justify-between mt-6">
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 bg-surfaceLight text-textPrimary"
+                                @click="goToPrevStep()"
+                                :disabled="testActive"
+                            >
+                                <i data-lucide="arrow-right" class="w-4 h-4 rotate-180"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 text-black font-medium"
+                                :class="allTestsCompleted() ? 'bg-primary opacity-100' : 'bg-primary/50 opacity-70'"
+                                @click="validateAndContinue()"
+                                :disabled="!allTestsCompleted() || testActive"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Step -->
+                    <div x-show="currentStep === 4" class="max-w-lg mx-auto">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-textPrimary">
+                                Результаты нейротестирования
+                            </h2>
+                            <p class="text-textSecondary">
+                                Анализ ваших показателей и индивидуальные рекомендации
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-xl mb-6 bg-surfaceLight">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-medium text-textPrimary">
+                                    Нейропрофиль
+                                </h3>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl font-bold text-primary" x-text="calculateOverallScore()"></span>
+                                    <span class="text-textSecondary">/ 100</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <template x-for="category in getTestCategories()" :key="category.id">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <div class="flex items-center gap-2">
+                                                <span
+                                                    class="w-3 h-3 rounded-full inline-block"
+                                                    :style="`background-color: ${category.color}`"
+                                                ></span>
+                                                <span class="text-sm text-textSecondary" x-text="category.name"></span>
+                                            </div>
+                                            <span class="text-sm font-medium text-textPrimary" x-text="calculateCategoryScore(category.id) + '%'"></span>
+                                        </div>
+                                        <div class="h-2 rounded-full overflow-hidden bg-surface/80">
+                                            <div
+                                                class="h-full rounded-full transition-all duration-1000"
+                                                :style="`background-color: ${category.color}; width: ${calculateCategoryScore(category.id)}%`"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="p-5 rounded-xl bg-surfaceLight">
+                            <h3 class="font-medium mb-3 text-textPrimary">
+                                Рекомендации по развитию
+                            </h3>
+
+                            <div class="space-y-3">
+                                <template x-for="(recommendation, index) in getRecommendations()" :key="index">
+                                    <div class="flex items-start gap-3">
+                                        <div class="mt-1 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/30">
+                                            <span class="text-primary" x-text="index + 1"></span>
+                                        </div>
+                                        <p class="text-textPrimary" x-text="recommendation"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="p-5 rounded-xl bg-surfaceLight mt-6">
+                            <h3 class="font-medium mb-3 text-textPrimary">
+                                Рекомендуемые курсы
+                            </h3>
+
+                            <div class="space-y-3">
+                                <template x-for="(course, index) in getRecommendedCourses()" :key="index">
+                                    <div class="flex items-center gap-3 p-3 rounded-lg bg-surface/50">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-primary/20">
+                                            <i data-lucide="book-open" class="w-5 h-5 text-primary"></i>
+                                        </div>
+                                        <span class="text-textPrimary font-medium" x-text="course"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-6">
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 bg-surfaceLight text-textPrimary"
+                                @click="goToPrevStep()"
+                            >
+                                <i data-lucide="arrow-right" class="w-4 h-4 rotate-180"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 text-black font-medium bg-primary"
+                                @click="goToNextStep()"
+                            >
+                                <span>Продолжить</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Plan Step -->
+                    <div x-show="currentStep === 5" class="max-w-lg mx-auto">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-textPrimary">
+                                Ваш персонализированный план
+                            </h2>
+                            <p class="text-textSecondary">
+                                На основе вашего профиля и результатов тестирования
+                            </p>
+                        </div>
+
+                        <div class="p-6 rounded-xl relative overflow-hidden bg-surfaceLight">
+                            <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full opacity-10 bg-primary"></div>
+
+                            <div class="relative">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="p-2 rounded-xl bg-primary">
+                                        <i data-lucide="award" class="w-5 h-5 text-black"></i>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-textPrimary" x-text="getProgramRecommendation().name"></h3>
+                                </div>
+
+                                <div class="mb-4">
+                                    <p class="text-textSecondary" x-text="getProgramRecommendation().description"></p>
+                                </div>
+
+                                <div class="flex flex-wrap gap-3 mb-6">
+                                    <div class="px-3 py-1.5 rounded-full text-sm flex items-center gap-1 bg-surfaceLight/80 text-textSecondary">
+                                        <i data-lucide="user" class="w-4 h-4"></i>
+                                        <span x-text="getProgramRecommendation().level"></span>
+                                    </div>
+
+                                    <div class="px-3 py-1.5 rounded-full text-sm flex items-center gap-1 bg-surfaceLight/80 text-textSecondary">
+                                        <i data-lucide="clock" class="w-4 h-4"></i>
+                                        <span x-text="getProgramRecommendation().duration"></span>
+                                    </div>
+
+                                    <div class="px-3 py-1.5 rounded-full text-sm flex items-center gap-1 bg-surfaceLight/80 text-textSecondary">
+                                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                                        <span>3 занятия в неделю</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3 mb-6">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-medium text-textPrimary">
+                                            Когнитивная нагрузка
+                                        </h4>
+                                        <div class="flex space-x-1">
+                                            <template x-for="(_, i) in Array(5)">
+                                                <div
+                                                    class="w-4 h-1 rounded-full"
+                                                    :class="i < getCognitiveIntensity() ? 'bg-primary' : 'bg-surface'"
+                                                ></div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-medium text-textPrimary">
+                                            Физическая нагрузка
+                                        </h4>
+                                        <div class="flex space-x-1">
+                                            <template x-for="(_, i) in Array(5)">
+                                                <div
+                                                    class="w-4 h-1 rounded-full"
+                                                    :class="i < getPhysicalIntensity() ? 'bg-primary' : 'bg-surface'"
+                                                ></div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-medium text-textPrimary">
+                                            Сложность
+                                        </h4>
+                                        <div class="flex space-x-1">
+                                            <template x-for="(_, i) in Array(5)">
+                                                <div
+                                                    class="w-4 h-1 rounded-full"
+                                                    :class="i < getDifficultyLevel() ? 'bg-primary' : 'bg-surface'"
+                                                ></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="rounded-xl p-4 mb-6 bg-primary/10">
+                                    <h4 class="font-medium mb-1 text-textPrimary">
+                                        Фазы программы
+                                    </h4>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-1 h-4 rounded-full bg-primary"></div>
+                                            <span class="text-sm text-textSecondary">
+                                                Фаза 1: Адаптация и обучение (2 недели)
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-1 h-4 rounded-full bg-accent1"></div>
+                                            <span class="text-sm text-textSecondary">
+                                                Фаза 2: Развитие и интеграция (2 недели)
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-1 h-4 rounded-full bg-accent2"></div>
+                                            <span class="text-sm text-textSecondary">
+                                                Фаза 3: Совершенствование (2-4 недели)
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="rounded-xl p-4 mb-4 bg-accent1/10">
+                                    <h4 class="font-medium mb-2 text-textPrimary">
+                                        Рекомендуемые курсы
+                                    </h4>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <template x-for="(course, index) in getRecommendedCourses()" :key="index">
+                                            <div class="flex items-center gap-2 p-2 rounded-lg bg-surfaceLight">
+                                                <i data-lucide="check-circle" class="w-4 h-4 text-accent1"></i>
+                                                <span class="text-sm text-textPrimary" x-text="course"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <button
+                                    class="w-full py-3 rounded-xl font-medium flex items-center justify-center bg-primary text-black hover:scale-102 transition-transform"
+                                >
+                                    <span>Начать программу</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-6">
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 bg-surfaceLight text-textPrimary"
+                                @click="goToPrevStep()"
+                            >
+                                <i data-lucide="arrow-right" class="w-4 h-4 rotate-180"></i>
+                                <span>Назад</span>
+                            </button>
+
+                            <button
+                                class="px-6 py-2 rounded-lg flex items-center gap-2 text-black font-medium bg-primary"
+                                @click="goToNextStep()"
+                            >
+                                <span>Завершить</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Complete Step -->
+                    <div x-show="currentStep === 6" class="max-w-lg mx-auto text-center">
+                        <div class="flex justify-center mb-6">
+                            <div class="relative">
+                                <div class="w-24 h-24 rounded-full flex items-center justify-center bg-primary/30">
+                                    <i data-lucide="check-circle" class="w-10 h-10 text-primary"></i>
+                                </div>
+                                <div class="absolute inset-0 rounded-full bg-primary animate-ping opacity-30"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 class="text-2xl font-bold mb-2 text-textPrimary">
+                                Поздравляем, <span x-text="userData.name || 'Вы'"></span>!
+                            </h2>
+                            <p class="text-textSecondary">
+                                Вы успешно завершили процесс настройки вашей персональной программы нейрофитнеса
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 mt-8">
+                            <div class="p-4 rounded-xl flex flex-col items-center bg-surfaceLight">
+                                <div class="floating">
+                                    <i data-lucide="calendar" class="w-8 h-8 mb-2 text-primary"></i>
+                                </div>
+                                <div class="font-medium text-textPrimary" x-text="getProgramRecommendation().duration"></div>
+                                <div class="text-sm text-textSecondary">Длительность</div>
+                            </div>
+
+                            <div class="p-4 rounded-xl flex flex-col items-center bg-surfaceLight">
+                                <div class="floating">
+                                    <i data-lucide="brain" class="w-8 h-8 mb-2 text-primary"></i>
+                                </div>
+                                <div class="font-medium text-textPrimary">
+                                    <span x-text="calculateOverallScore()"></span>%
+                                </div>
+                                <div class="text-sm text-textSecondary">Нейропрофиль</div>
+                            </div>
+
+                            <div class="p-4 rounded-xl flex flex-col items-center bg-surfaceLight">
+                                <div class="floating">
+                                    <i data-lucide="target" class="w-8 h-8 mb-2 text-primary"></i>
+                                </div>
+                                <div class="font-medium text-textPrimary" x-text="getProgramRecommendation().level"></div>
+                                <div class="text-sm text-textSecondary">Уровень</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <div class="p-6 rounded-xl text-left bg-surfaceLight">
+                                <h3 class="font-medium mb-4 text-textPrimary">Что дальше?</h3>
+                                <ul class="space-y-4">
+                                    <li class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-primary/30">
+                                            <span class="text-primary">1</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-textPrimary">Ваша первая тренировка</p>
+                                            <p class="text-sm text-textSecondary">
+                                                Начнется завтра в удобное для вас время. Не забудьте подготовить удобную одежду и воду.
+                                            </p>
+                                        </div>
+                                    </li>
+
+                                    <li class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-primary/30">
+                                            <span class="text-primary">2</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-textPrimary">Отслеживайте прогресс</p>
+                                            <p class="text-sm text-textSecondary">
+                                                Мы будем анализировать ваши результаты и адаптировать программу для достижения лучших результатов.
+                                            </p>
+                                        </div>
+                                    </li>
+
+                                    <li class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-primary/30">
+                                            <span class="text-primary">3</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-textPrimary">Регулярность — ключ к успеху</p>
+                                            <p class="text-sm text-textSecondary">
+                                                Для достижения наилучших результатов следуйте программе регулярно, не пропуская тренировки.
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <button
+                                class="px-8 py-3 rounded-full text-black font-medium bg-primary hover:scale-105 transition-transform"
+                            >
+                                <span>Перейти к тренировкам</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile 3D model (only shown on welcome screen) -->
+        <div x-show="currentStep === 0" class="md:hidden h-64 relative mt-4 brain-bg">
+            <div class="floating flex items-center justify-center h-full">
+                <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 20C55.8172 20 20 55.8172 20 100C20 144.183 55.8172 180 100 180C144.183 180 180 144.183 180 100C180 55.8172 144.183 20 100 20Z" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M60 80C60 63.4315 73.4315 50 90 50C106.569 50 120 63.4315 120 80C120 96.5685 106.569 110 90 110" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M140 80C140 63.4315 126.569 50 110 50C93.4315 50 80 63.4315 80 80C80 96.5685 93.4315 110 110 110" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M60 120C60 136.569 73.4315 150 90 150C106.569 150 120 136.569 120 120C120 103.431 106.569 90 90 90" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M140 120C140 136.569 126.569 150 110 150C93.4315 150 80 136.569 80 120C80 103.431 93.4315 90 110 90" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M90 50C90 50 70 65 70 100C70 135 90 150 90 150" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M110 50C110 50 130 65 130 100C130 135 110 150 110 150" stroke="#B7F501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Progress indicator (mobile) -->
+        <div x-show="currentStep > 0" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 md:hidden">
+            <div class="flex space-x-3">
+                <template x-for="(_, index) in steps" :key="index">
+                    <div
+                        class="w-2 h-2 rounded-full"
+                        :class="index === currentStep ? 'bg-primary pulse' : index < currentStep ? 'bg-accent1' : 'bg-surfaceLight'"
+                    ></div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Achievement notification -->
+        <div
+            x-show="showAchievement"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-10"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-10"
+            class="fixed bottom-6 right-6 p-4 rounded-xl max-w-sm z-50 bg-surfaceLight bg-blur shadow-lg"
+            style="box-shadow: 0 10px 25px -5px rgba(183, 245, 1, 0.3);"
+        >
+            <div class="flex items-start gap-3">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/20">
+                    <i data-lucide="award" class="w-6 h-6 text-primary"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-textPrimary" x-text="achievementTitle"></h4>
+                    <p class="text-sm text-textSecondary" x-text="achievementDesc"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test results notification -->
+        <div
+            x-show="showTestResult"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="fixed inset-0 flex items-center justify-center z-50 bg-black/70"
+        >
+            <div class="bg-surfaceLight rounded-xl p-6 max-w-md w-full mx-4">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-textPrimary" x-text="currentTestName"></h3>
+                    <button @click="closeTestResult()" class="text-textSecondary hover:text-textPrimary">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-sm text-textSecondary mb-2">Ваш результат:</div>
+                    <div class="font-medium text-textPrimary" x-text="currentTestAnswer"></div>
+                </div>
+
+                <div class="mb-6">
+                    <div class="text-sm text-textSecondary mb-2">Расшифровка:</div>
+                    <div class="text-textPrimary text-sm" x-text="currentTestExplanation"></div>
+                </div>
+
+                <div x-show="currentTestRecommendations.length > 0">
+                    <div class="text-sm text-textSecondary mb-2">Рекомендуемые курсы:</div>
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="(rec, idx) in currentTestRecommendations" :key="idx">
+                            <div class="bg-primary/20 text-primary text-sm px-3 py-1 rounded-full" x-text="rec"></div>
+                        </template>
+                    </div>
+                </div>
+
+                <button
+                    @click="closeTestResult()"
+                    class="w-full mt-6 py-2 rounded-lg bg-primary text-black font-medium"
+                >
+                    Понятно
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function neuronlineApp() {
+            return {
+                currentStep: 0,
+                userData: {
+                    name: '',
+                    age: '',
+                    gender: '',
+                    height: '',
+                    weight: '',
+                    goal: '',
+                    activityLevel: '',
+                    experience: '',
+                    restrictions: [],
+                    preferences: []
+                },
+                testResults: {},
+                testActive: false,
+                testType: '',
+                testTime: 0,
+                timerInterval: null,
+                showAchievement: false,
+                achievementTitle: '',
+                achievementDesc: '',
+
+                // Test result modal
+                showTestResult: false,
+                currentTestName: '',
+                currentTestAnswer: '',
+                currentTestExplanation: '',
+                currentTestRecommendations: [],
+
+                // Neurotesting data
+                neuroTestData: {
+                    vestibular: {
+                        "1. Стою уверенно ": {
+                            explanation: "Ваша система равновесия работает корректно, вестибулярный аппарат быстро реагирует на изменения и стабилизирует вас. Хорошая устойчивость позволит вам эффективно работать с осанкой и увеличивать функционально-силовые показатели.",
+                            recommendations: ["Весь пакет курсов"]
+                        },
+                        "2. Сложнее на левой ноге (сзади)": {
+                            explanation: "Неустойчивое положение на левой ноге или завал влево, говорят о слабости вестибулярного аппарата и мозжечка с одной стороны. Вам следует добавить в свою программу тренировок вестибулярную гимнастику и работу со зрением.",
+                            recommendations: ["Нейрозарядка", "Нейротренировки"]
+                        },
+                        "3. Сложнее на правой ноге (сзади)": {
+                            explanation: "Неустойчивое положение на правой ноге или завал вправо, говорят о слабости вестибулярного аппарата и мозжечка с одной стороны. Вам следует добавить в свою программу тренировок вестибулярную гимнастику и работу со зрением.",
+                            recommendations: ["Нейрозарядка", "Нейротренировки"]
+                        },
+                        "4. Неустойчиво в обоих случаях": {
+                            explanation: "Неустойчивость в тандемной стойке указывает на высокую угрозу для нервной системы - вашему мозгу это положение сложно и небезопасно. Мы настоятельно рекомендуем включить в свою ежедневную активность дыхательнве упражнения и упражнения из вестибулярной гимнастики.",
+                            recommendations: ["Нейрозарядка", "Нейротренировки", "Пресс и дыхание"]
+                        }
+                    },
+                    flexibility: {
+                        "1.Пальцы на уровне колен": {
+                            explanation: "Ваш результат в тесте \"Наклон\" указывает на напряжение по задней поверхности тела (спина, ноги). Это происходит из-за высокого уровня стресса и напряжения в теле. Снижая уровень угроз с нервной системы, вы сможете значительно улучшить результат в гибкости. Мы рекомендуем уделить внимание дыханию и упражнениям на мобильность суставов.",
+                            recommendations: ["Красивая осанка", "Пресс и дыхание"]
+                        },
+                        "2.Пальцы на уровне середины голени": {
+                            explanation: "Ваш результат в тесте \"Наклон\" указывает на напряжение по задней поверхности тела (спина, ноги). Это происходит из-за высокого уровня стресса и напряжения в теле. Снижая уровень угроз с нервной системы, вы сможете значительно улучшить результат в гибкости. Мы рекомендуем уделить внимание дыханию и упражнениям на мобильность суставов.",
+                            recommendations: ["Красивая осанка", "Пресс и дыхание"]
+                        },
+                        "3.Пальцы у голеностопа": {
+                            explanation: "Ваша нервная система обладает хорошей пластичностью и подстраивается под заданные условия, реагируя небольшим тонусом мышц разгибателей, которые, и не позволяют вам опуститься ниже. Мы рекомендуем больше внимания уделять дыханию и работе с мобильностью суставов.",
+                            recommendations: ["Красивая осанка", "Пресс и дыхание"]
+                        },
+                        "4. Пальцы на полу": {
+                            explanation: "Вы показали хороший результат в гибкости, ваши мышцы разгибатели тела находятся в достаточно хорошем балансе с мышцами сгибателями, нервная система не испытывает больших угроз и ваше состояние позволяет прогрессировать и улучшать результаты в физической форме и здоровье.",
+                            recommendations: ["Весь пакет курсов"]
+                        },
+                        "5. Ладонь на полу": {
+                            explanation: "Вы показали отличный результат в гибкости, ваши мышцы разгибатели тела находятся в достаточно хорошем балансе с мышцами сгибателями, нервная система не испытывает больших угроз и ваше состояние позволяет прогрессировать и улучшать результаты в физической форме и здоровье.",
+                            recommendations: ["Весь пакет курсов"]
+                        }
+                    },
+                    breathing: {
+                        "1. До 40 шагов": {
+                            explanation: "Косвенно говорит о том, что вы находитесь в состоянии повышенного стресса и гипервентилируете себя (интенсивное дыхание, которое превышает потребности организма в кислороде). Из-за этого кислород не проникает в клетки организма и клетки испытывают недостаток питания — кислорода. Это негативно сказывается на работе вашего мозга, можете замечать быструю утомляемость, упадок сил, неспособность быстро принимать решения и концентрировать внимание. Мы рекомендуем незамедлительно начать восстанавливать свои ресурсы и начать необходимо с образа жизни: нормализуйте сон, режим и качество питания, добавьте прогулки на свежем воздухе и несложные нейроупражнения на улучшения паттерна дыхания и тренировку лобных долей мозга.",
+                            recommendations: ["Нейрозарядка", "Пресс и дыхание"]
+                        },
+                        "2. От 60 до 80 шагов": {
+                            explanation: "Этот тест иллюстрирует в каком состоянии находится ваша транспортная система кислорода в клетки организма. Чем дольше вы можете оставаться без нового вдоха при этом не испытывать сильного дискомфорта, тем толерантнее ваши рецепторы к повышению углекислого газа, а кровь способна отдавать кислород клеткам. Ваш результат близок к норме, норма от 80 шагов, но говорит о том, что эта система всё еще работает неоптимально, и вы недополучаете кислород! Стоит рассмотреть специальные тренировки на улучшение паттерна дыхания и выполнять ежедневные кардио нагрузки, чередуя их с силовыми нейроупражнениями.",
+                            recommendations: ["Нейрозарядка", "Пресс и дыхание"]
+                        },
+                        "3. Больше 80 шагов": {
+                            explanation: "Этот результат считается нормой в этом тесте. Тест иллюстрирует в каком состоянии находится ваша транспортная система кислорода в клетки организма. Чем дольше вы можете оставаться без нового вдоха, при этом не испытывать сильного дискомфорта, тем толерантнее ваши рецепторы к повышению углекислого газа, а кровь способна отдавать кислород клеткам. Продолжайте вести активный образ жизни и добавляйте новизну с свои привычные тренировки.",
+                            recommendations: ["Весь пакет курсов"]
+                        }
+                    },
+                    diaphragm: {
+                        "1. До 3 см": {
+                            explanation: "Ваш результат в тесте на работу дуафрагмы говорит о недостаточной активности этой мышцы, а следовательно и неоптимальном использовании дыхательной мускулатуры, что может негативно сказываться на общем самочувствии и ощущениях напряжения в спине шее. Рекомендуем больше внимания уделять грудному отделу позвоночника и дыханию.",
+                            recommendations: ["Нейрозарядка", "Пресс и дыхание", "Красивая осанка"]
+                        },
+                        "2. От 3 до 5 см": {
+                            explanation: "Ваша разница между вдохом и выдохом недостаточная для оптимальной работы мышц и подвижности органов. Следует больше внимания уделять грудному отделу позвоночника и дыханию.",
+                            recommendations: ["Нейрозарядка", "Пресс и дыхание", "Красивая осанка"]
+                        },
+                        "3. От 5 см и больше": {
+                            explanation: "Ваш результат говорит о достаточной экскурсии (движении внутри грудной клетки) диафрагмы и оптимальном паттерне дыхания. Вам могут быть полезны тренировки на всё тело и высокоинтенсивные тренировки.",
+                            recommendations: ["Весь пакет курсов"]
+                        }
+                    },
+                    pelvic: {
+                        "1. Распирание и натуживание": {
+                            explanation: "Распирание и натуживание в области промежности при надувании шарика, говорит о о том, что мышцы промежности не справляются с увеличением внутребрюшного давления и диафрагмы тела (грудобрюшная и тазовая) работают ассинхронно. Вам подойдут мягкие техники работы с суставами всего тела и акцентная работа с мышцами тазового дна.",
+                            recommendations: ["Нейрозарядка", "Пресс и дыхание", "Красивая осанка"]
+                        },
+                        "2. Подтягивание ": {
+                            explanation: "Ваш результат в тесте на работу мышц тазового дна считается нормой. Диафрагмы тела (грудобрюшная и тазовая) работают синхронно и мышцы хорошо регулируют внутрибрюшное давление. Вы можете тренироваться полноценно, но не забывать о дыхании и контролем мышц живота и промежности во время силовых.",
+                            recommendations: ["Весь пакет курсов"]
+                        },
+                        "3. Ничего": {
+                            explanation: "Отсутствие ощущений при надувании шарика может говорить о недостаточном контроле зоны промежности со стороны нашего мозга. Регион таза представлен в головном мозге небольшой областью, которую достаточно сложно активировать. Используйте рекомендации тренеров \"нейрон\" для усиления работы мышц тазового дна: работа с языком и дыхание.",
+                            recommendations: ["Нейрозарядка", "Пресс и дыхание", "Нейротренировки"]
+                        }
+                    },
+                    vision: {
+                        "1.Вижу все строчки двумя глазами": {
+                            explanation: "Вижу все строчки двумя глазами. Отличный результат, у вас хорошая острота зрения.",
+                            recommendations: []
+                        },
+                        "2. Правый глаз видит хуже левого": {
+                            explanation: "Необходимо выяснить причину ухудшения зрения с одной стороны. Возможно это произошло из-за большой нагрузки на зрение: экран телефона и компьютер. Попробуйте упражения для глазодвигательных мышц из курса \"нейрозарядки\" и выполняйте тестирование повторно.",
+                            recommendations: ["Нейрозарядка"]
+                        },
+                        "3. Левый глаз видит хуже правого": {
+                            explanation: "Необходимо выяснить причину ухудшения зрения с одной стороны. Возможно это произошло из-за большой нагрузки на зрение: экран телефона и компьютер. Попробуйте упражения для глазодвигательных мышц из курса \"нейрозарядки\" и выполняйте тестирование повторно.",
+                            recommendations: ["Нейрозарядка"]
+                        },
+                        "4. Оба глаза не видят нижние строчки": {
+                            explanation: "Ухудшение зрения может быть связано с образом жизни и большой нагрузкой на глазодвигательные мышцы. Вам следует давать глазам отдых во время рабочего дня и ежедневно выполнять гимнастику для глаз из курса нейрозарядки.",
+                            recommendations: ["Нейрозарядка"]
+                        }
+                    },
+                    eyeConvergence: {
+                        "1. Глаза двигаются синхронно": {
+                            explanation: "Отлично! Ваши мышцы глаза, отвчающие за фиксацию вблизи и вдали работают согласованно, без асимметрии.",
+                            recommendations: ["Весь пакет курсов"]
+                        },
+                        "2.Правый глаз двигается хуже (либо не двигается совсем)": {
+                            explanation: "Это говорит о напряжении мышц с одной стороны. Может быть вызвано привычкой смотреть в экран телефона или компьютера с одной стороны. Рекомендуем тренировать отдельно этот глаз. В разделе нейроосновы \"зрение и мозжечок\", мы даем упражнения для коррекции.",
+                            recommendations: ["Нейроосновы", "Нейрозарядка"]
+                        },
+                        "3. Левый глаз двигается хуже (либо не двигается совсем)": {
+                            explanation: "Это говорит о напряжении мышц с одной стороны. Может быть вызвано привычкой смотреть в экран телефона или компьютера с одной стороны. Рекомендуем тренировать отдельно этот глаз. В разделе нейроосновы \"зрение и мозжечок\", мы даем упражнения для коррекции.",
+                            recommendations: ["Нейроосновы", "Нейрозарядка"]
+                        },
+                        "4. Глаза не соединяются/не разводятся": {
+                            explanation: "Полное отсутствие навыка сведение глаз говорит о сильном напряжении мышц и необходимости специальных корректирующих упражнений. Обязательно изучите раздел нейроосновы \"зрение и мозжечок\" и начните тренировать зрение ежедневно!",
+                            recommendations: ["Нейроосновы", "Нейрозарядка"]
+                        }
+                    },
+                    eyeHand: {
+                        "1. 20 из 20 на обе руки": {
+                            explanation: "Блестящий результат! Вы очень быстро обрабатываете информацию и точно реагируете.",
+                            recommendations: []
+                        },
+                        "2. Правая ошибалась чаще левой": {
+                            explanation: "За координацию вашей правой руки отвечает правое полушарие мозжечка (Мозжечок - отдел мозга, отвечающий за координацию и точность). Есть хорошие новости - вы можете подтянуть свою правую руку, мозжечок быстро учится, надо только практиковаться! Рекомендуем выполнять упражнения с мячом ежедневно!",
+                            recommendations: []
+                        },
+                        "3. Левая ошибалась чаще правой": {
+                            explanation: "За координацию вашей левой руки отвечает левое полушарие мозжечка (Мозжечок - отдел мозга, отвечающий за координацию и точность). Есть хорошие новости - вы можете подтянуть свою правую руку, мозжечок быстро учится, надо только практиковаться! Рекомендуем выполнять упражнения с мячом ежедневно!",
+                            recommendations: []
+                        },
+                        "4. Было сложно на обе руки": {
+                            explanation: "Представьте, какие сложные процессы происходят в мозге, когда вы бросаете мяч: глаза должны увидеть, мозжечок обработать информацию о скорости и расстоянии до объекта, кора должна распознать объект и дать команду мышцам - поймать. Примите это в расчет и не опускайте руки, возможно, вам просто нужно больше практиковаться! Хорошие новости - мозжечок быстро учится и уже через 2-3 занятия у вас будет получаться!",
+                            recommendations: []
+                        }
+                    },
+                    dominantEye: {
+                        "1. Объект остался на месте, вижу одинаково двумя глазами.": {
+                            explanation: "Прекрасно! У вас не утрачена способность одновременно чётко видеть изображение предмета обоими глазами.",
+                            recommendations: []
+                        },
+                        "2. Изображение съехало, когда смотрю одним глазом": {
+                            explanation: "Вы обладатель ведущего глаза, другими словами, ваша нервная система имеет приорететный глаз, который получает больше информации из внешнего мира. Это негативно сказывается на общем самочувствии и осанке. Если при закрытии левого глаза, изображение не меняется, то ваш ведущий глаз - ПРАВЫЙ. Если при закрытии правого глаза, изображение не меняется, то ваш ведущий глаз - ЛЕВЫЙ. Необходимо настраивать работу отстающего глаза специальными упражнениями, смотрите раздел нейроосновы \"зрение и мозжечок\"",
+                            recommendations: ["Нейрозарядка"]
+                        }
+                    },
+                    smell: {
+                        "1. чувствую аромат сразу и узнаю его": {
+                            explanation: "Отлично! Ваша система распознавания ароматов работает без изъянов, это большая редкость в наше время (стресс и вирусы влияют), и ваше большое преимущество!",
+                            recommendations: []
+                        },
+                        "2. не ощущаю правой": {
+                            explanation: "Этот казалось бы незначительный аспект, о котором вы возможно не знали до этого теста, может негативно сказываться на вашем самочувствии. Система обоняния тесно связана с эмоциями и паамятью, состояние стресса и тревоги может быть из-за плохого обоняния. Следует отдельно тренировать обоняние.",
+                            recommendations: ["Нейрозарядка", "Нейротренировки"]
+                        },
+                        "3. не ощущаю левой": {
+                            explanation: "Этот казалось бы незначительный аспект, о котором вы возможно не знали до этого теста, может негативно сказываться на вашем самочувствии. Система обоняния тесно связана с эмоциями и паамятью, состояние стресса и тревоги может быть из-за плохого обоняния. Следует отдельно тренировать обоняние.",
+                            recommendations: []
+                        },
+                        "4. не чувствую двумя": {
+                            explanation: "Этот казалось бы незначительный аспект, о котором вы возможно не знали до этого теста, может негативно сказываться на вашем самочувствии. Система обоняния тесно связана с эмоциями и паамятью, состояние стресса и тревоги может быть из-за плохого обоняния. Следует отдельно тренировать обоняние.",
+                            recommendations: []
+                        }
+                    },
+                    stroop: {
+                        "1. Меньше 1  минуты": {
+                            explanation: "Очень хороший уровень. Ваш мозг быстрый и гибкий! Так держать!",
+                            recommendations: []
+                        },
+                        "2. От 1 до 1,30 мин": {
+                            explanation: "Хороший результат, но вы можете быстрее. На результат могут влиять состояние усталости и стресса. Возможно стоит повторить тест в наиболее благоприятном состоянии.",
+                            recommendations: ["Нейрозарядка"]
+                        },
+                        "3. от 1.30 мин": {
+                            explanation: "Ваша скорость выполнения теста говорит о высоком уровне напряжения нервной системы, вам сложно сконцентрироваться на задаче и , возможно, вы допускаете неточности при выполнении. Рекомендуем обратить внимание на ваш образ жизни и добавить ежедневную двигательную активность и упражнения для дыхания.",
+                            recommendations: ["Нейрозарядка"]
+                        }
+                    },
+                    pulse: {
+                        "1. Увеличение пульса после подъема  \nОт 0 до +10 уд/мин": {
+                            explanation: "Норма. Вы можете выполнять высокоинтенсивные тренировки с контролем пульса. Ваша нервна система готова к развитию скоростно-силовых характеристи",
+                            recommendations: ["Добавь энергии"]
+                        },
+                        "2. Увеличение пульса после подъема  От +11 до +16 уд/мин \n": {
+                            explanation: "Легкие нарушения вегетативной нервной системы. Высокий уровень стресса, необходимо корректировать состояние, не злоупотреблять интенсивными тренировками (они усугубят состояние НС)",
+                            recommendations: ["Красивая осанка", "Пресс и дыхание"]
+                        },
+                        "3.Увеличение пульса после подъема  От +17 до + 22 уд/мин": {
+                            explanation: "Возможны значительные нарушения Вегетативной НС. Повышенный тонус симпатической НС. В этом случае тренировки высокой интенсивности и тяжелые силовые противопоказаны.",
+                            recommendations: ["Красивая осанка", "Пресс и дыхание"]
+                        },
+                        "4. Снижение пульса от -2 уд/мин": {
+                            explanation: "Пониженный тонус симпатической НС. Возможно длительное пребывание в стрессе. Рекомендуем дополнительное обследование у кардиолога и невролога. Тренировки низкой интенсивности",
+                            recommendations: ["Нейрозарядка", "Красивая осанка", "Пресс и дыхание"]
+                        }
+                    }
+                },
+
+                steps: [
+                    {
+                        id: 'welcome',
+                        title: 'Добро пожаловать в Neuronline',
+                        subtitle: 'Платформа нейрофитнеса, объединяющая тренировки мозга и тела',
+                        icon: 'brain',
+                        modelType: 'brain'
+                    },
+                    {
+                        id: 'profile',
+                        title: 'Создайте свой профиль',
+                        subtitle: 'Расскажите о себе для персонализации тренировок',
+                        icon: 'user-circle',
+                        modelType: 'human'
+                    },
+                    {
+                        id: 'goals',
+                        title: 'Ваши цели',
+                        subtitle: 'Определите направления для развития',
+                        icon: 'target',
+                        modelType: 'brain'
+                    },
+                    {
+                        id: 'neurotesting',
+                        title: 'Нейротестирование',
+                        subtitle: 'Измерьте ваши когнитивные и физические показатели',
+                        icon: 'activity',
+                        modelType: 'brain'
+                    },
+                    {
+                        id: 'results',
+                        title: 'Результаты анализа',
+                        subtitle: 'Ваш нейропрофиль и рекомендации',
+                        icon: 'bar-chart-2',
+                        modelType: 'brain'
+                    },
+                    {
+                        id: 'plan',
+                        title: 'Ваш персонализированный план',
+                        subtitle: 'Оптимальная программа тренировок на основе ваших данных',
+                        icon: 'calendar',
+                        modelType: 'both'
+                    },
+                    {
+                        id: 'complete',
+                        title: 'Готово к старту!',
+                        subtitle: 'Начните свой путь к улучшению физических и когнитивных способностей',
+                        icon: 'check-circle',
+                        modelType: 'brain'
+                    }
+                ],
+
+                neuroTests: [
+                    {
+                        id: 'vestibular',
+                        name: 'Вестибулярная система',
+                        description: 'Оценка осознания себя в пространстве и равновесия',
+                        icon: 'activity',
+                        duration: 30,
+                        color: 'accent1',
+                        category: 'balance'
+                    },
+                    {
+                        id: 'flexibility',
+                        name: 'Гибкость',
+                        description: 'Тест на наклон для оценки гибкости тела',
+                        icon: 'move',
+                        duration: 20,
+                        color: 'accent3',
+                        category: 'physical'
+                    },
+                    {
+                        id: 'breathing',
+                        name: 'Дыхание',
+                        description: 'Задержка дыхания на выдохе в шаге',
+                        icon: 'wind',
+                        duration: 60,
+                        color: 'success',
+                        category: 'breathing'
+                    },
+                    {
+                        id: 'diaphragm',
+                        name: 'Работа диафрагмы',
+                        description: 'Тест на работу диафрагмы',
+                        icon: 'lungs',
+                        duration: 30,
+                        color: 'success',
+                        category: 'breathing'
+                    },
+                    {
+                        id: 'pelvic',
+                        name: 'Мышцы тазового дна',
+                        description: 'Тест "Надуваем воздушный шарик"',
+                        icon: 'circle',
+                        duration: 30,
+                        color: 'accent2',
+                        category: 'physical'
+                    },
+                    {
+                        id: 'vision',
+                        name: 'Острота зрения',
+                        description: 'Проверка остроты зрения',
+                        icon: 'eye',
+                        duration: 30,
+                        color: 'warning',
+                        category: 'vision'
+                    },
+                    {
+                        id: 'eyeConvergence',
+                        name: 'Сведение глаз',
+                        description: 'Тест на сведение и разведение глаз',
+                        icon: 'eye',
+                        duration: 20,
+                        color: 'warning',
+                        category: 'vision'
+                    },
+                    {
+                        id: 'eyeHand',
+                        name: 'Тест "глаза-рука"',
+                        description: 'Оценка координации глаз и рук',
+                        icon: 'hand',
+                        duration: 60,
+                        color: 'accent1',
+                        category: 'coordination'
+                    },
+                    {
+                        id: 'dominantEye',
+                        name: 'Ведущий глаз',
+                        description: 'Определение ведущего глаза',
+                        icon: 'eye',
+                        duration: 15,
+                        color: 'warning',
+                        category: 'vision'
+                    },
+                    {
+                        id: 'smell',
+                        name: 'Обоняние',
+                        description: 'Тест на распознавание запаха',
+                        icon: 'flower',
+                        duration: 30,
+                        color: 'accent2',
+                        category: 'sensory'
+                    },
+                    {
+                        id: 'stroop',
+                        name: 'СТРУП-тест',
+                        description: 'Тест на когнитивную гибкость',
+                        icon: 'brain',
+                        duration: 90,
+                        color: 'accent1',
+                        category: 'cognitive'
+                    },
+                    {
+                        id: 'pulse',
+                        name: 'Ортостатическая проба',
+                        description: 'Измерение пульса в покое и при вставании',
+                        icon: 'heart',
+                        duration: 120,
+                        color: 'error',
+                        category: 'physical'
+                    }
+                ],
+
+                availableGoals: [
+                    {
+                        id: 'cognitive',
+                        name: 'Улучшение когнитивных функций',
+                        icon: 'brain',
+                        color: 'accent1',
+                        description: 'Тренировки для улучшения работы мозга, памяти и концентрации'
+                    },
+                    {
+                        id: 'physical',
+                        name: 'Физическая форма',
+                        icon: 'dumbbell',
+                        color: 'accent3',
+                        description: 'Упражнения для улучшения физической формы и силы'
+                    },
+                    {
+                        id: 'balance',
+                        name: 'Баланс и координация',
+                        icon: 'activity',
+                        color: 'success',
+                        description: 'Программа для развития равновесия и координации движений'
+                    },
+                    {
+                        id: 'stress',
+                        name: 'Снижение стресса',
+                        icon: 'heart',
+                        color: 'accent2',
+                        description: 'Техники для снижения стресса и улучшения эмоционального состояния'
+                    },
+                    {
+                        id: 'energy',
+                        name: 'Повышение энергии',
+                        icon: 'zap',
+                        color: 'warning',
+                        description: 'Тренировки для повышения энергии и жизненного тонуса'
+                    }
+                ],
+
+                experienceLevels: [
+                    {
+                        id: 'beginner',
+                        name: 'Начинающий',
+                        description: 'Мало или совсем нет опыта в фитнесе'
+                    },
+                    {
+                        id: 'intermediate',
+                        name: 'Средний',
+                        description: 'Регулярно тренируюсь 3-6 месяцев'
+                    },
+                    {
+                        id: 'advanced',
+                        name: 'Продвинутый',
+                        description: 'Тренируюсь больше 6 месяцев'
+                    }
+                ],
+
+                init() {
+                    // Initialize Lucide icons
+                    lucide.createIcons();
+                },
+
+                getCurrentModelType() {
+                    return this.steps[this.currentStep].modelType;
+                },
+
+                getCurrentTestDuration() {
+                    const test = this.neuroTests.find(t => t.id === this.testType);
+                    return test ? test.duration : 30;
+                },
+
+                getCurrentTestName() {
+                    const test = this.neuroTests.find(t => t.id === this.testType);
+                    return test ? test.name : '';
+                },
+
+                goToNextStep() {
+                    this.currentStep = Math.min(this.currentStep + 1, this.steps.length - 1);
+
+                    // Show achievement for completing steps
+                    if (this.currentStep === 1) {
+                        this.showAchievementNotification('Начинаем путешествие!', 'Давайте создадим ваш профиль');
+                    } else if (this.currentStep === 2) {
+                        this.showAchievementNotification('Профиль создан!', 'Вы успешно завершили создание профиля');
+                    } else if (this.currentStep === 3) {
+                        this.showAchievementNotification('Цели определены!', 'Вы успешно определили свои цели тренировок');
+                    } else if (this.currentStep === 4) {
+                        this.showAchievementNotification('Нейротестирование завершено!', 'Вы прошли все тесты и готовы к анализу результатов');
+                    } else if (this.currentStep === 6) {
+                        this.showAchievementNotification('Onboarding завершен!', 'Вы готовы начать свой путь к улучшению физических и когнитивных способностей');
+                    }
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                goToPrevStep() {
+                    this.currentStep = Math.max(this.currentStep - 1, 0);
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                validateAndContinue() {
+                    // Check if current step requires validation
+                    if (this.currentStep === 1 && !this.canContinueFromProfile()) {
+                        alert('Пожалуйста, заполните все обязательные поля профиля');
+                        return;
+                    } else if (this.currentStep === 2 && !this.userData.goal) {
+                        alert('Пожалуйста, выберите хотя бы одну цель');
+                        return;
+                    } else if (this.currentStep === 3 && !this.allTestsCompleted()) {
+                        alert('Пожалуйста, пройдите все тесты перед продолжением');
+                        return;
+                    }
+
+                    this.goToNextStep();
+                },
+
+                canContinueFromProfile() {
+                    return this.userData.name && this.userData.age && this.userData.gender;
+                },
+
+                allTestsCompleted() {
+                    // At least 6 tests should be completed to continue
+                    return Object.keys(this.testResults).length >= 6;
+                },
+
+                startTest(testId) {
+                    this.testActive = true;
+                    this.testType = testId;
+                    this.testTime = 0;
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                cancelTest() {
+                    this.testActive = false;
+                    this.testType = '';
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                selectTestAnswer(testType, answer) {
+                    // Store the test result
+                    this.testResults[testType] = answer;
+
+                    // Get test explanation and recommendations
+                    const testData = this.neuroTestData[testType][answer];
+                    const testName = this.neuroTests.find(t => t.id === testType).name;
+
+                    // Show test result modal
+                    this.currentTestName = testName;
+                    this.currentTestAnswer = answer;
+                    this.currentTestExplanation = testData.explanation;
+                    this.currentTestRecommendations = testData.recommendations || [];
+                    this.showTestResult = true;
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                closeTestResult() {
+                    this.showTestResult = false;
+                    this.testActive = false;
+                    this.testType = '';
+
+                    // Show achievement notification
+                    this.showAchievementNotification(
+                        `Тест "${this.currentTestName}" завершен!`,
+                        `Результат сохранен`
+                    );
+
+                    // Re-initialize Lucide icons after DOM update
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                },
+
+                showAchievementNotification(title, description) {
+                    this.achievementTitle = title;
+                    this.achievementDesc = description;
+                    this.showAchievement = true;
+
+                    setTimeout(() => {
+                        this.showAchievement = false;
+                    }, 4000);
+                },
+
+                getTestCategories() {
+                    return [
+                        { id: 'balance', name: 'Баланс и равновесие', color: '#00D1FF' },
+                        { id: 'breathing', name: 'Дыхание', color: '#00C853' },
+                        { id: 'vision', name: 'Зрение', color: '#FFD600' },
+                        { id: 'physical', name: 'Физическая форма', color: '#FF9500' },
+                        { id: 'cognitive', name: 'Когнитивные функции', color: '#FF00E5' }
+                    ];
+                },
+
+                calculateCategoryScore(categoryId) {
+                    const testsInCategory = this.neuroTests.filter(test => test.category === categoryId);
+                    const completedTests = testsInCategory.filter(test => this.testResults[test.id]);
+
+                    if (completedTests.length === 0) return 0;
+
+                    // Calculate score based on test results
+                    let score = 0;
+                    completedTests.forEach(test => {
+                        const answer = this.testResults[test.id];
+                        // Extract the number from the answer (usually first character)
+                        const answerNumber = parseInt(answer.match(/\d+/)[0]);
+
+                        // Calculate score based on answer number and test type
+                        if (['vestibular', 'flexibility', 'breathing', 'diaphragm', 'pelvic'].includes(test.id)) {
+                            // For these tests, higher numbers are better
+                            const maxNumber = test.id === 'flexibility' ? 5 : 4;
+                            score += (answerNumber / maxNumber) * 100;
+                        } else if (['vision', 'eyeConvergence', 'eyeHand', 'dominantEye', 'smell', 'stroop', 'pulse'].includes(test.id)) {
+                            // For these tests, lower numbers are better
+                            const maxNumber = test.id === 'dominantEye' ? 2 : 4;
+                            score += ((maxNumber - answerNumber + 1) / maxNumber) * 100;
+                        }
+                    });
+
+                    return Math.round(score / completedTests.length);
+                },
+
+                calculateOverallScore() {
+                    const categories = this.getTestCategories();
+                    let totalScore = 0;
+                    let completedCategories = 0;
+
+                    categories.forEach(category => {
+                        const score = this.calculateCategoryScore(category.id);
+                        if (score > 0) {
+                            totalScore += score;
+                            completedCategories++;
+                        }
+                    });
+
+                    return completedCategories > 0 ? Math.round(totalScore / completedCategories) : 0;
+                },
+
+                getRecommendations() {
+                    const recommendations = [];
+
+                    // Add recommendations based on test results
+                    Object.entries(this.testResults).forEach(([testId, answer]) => {
+                        const testData = this.neuroTestData[testId][answer];
+                        const testName = this.neuroTests.find(t => t.id === testId).name;
+
+                        // Add recommendation if explanation exists and it's not already in the list
+                        if (testData.explanation && !recommendations.includes(testData.explanation)) {
+                            recommendations.push(`${testName}: ${testData.explanation}`);
+                        }
+                    });
+
+                    // If no recommendations, add a default one
+                    if (recommendations.length === 0) {
+                        recommendations.push('На основе ваших результатов мы рекомендуем комплексную программу тренировок, которая поможет улучшить все аспекты вашего физического и когнитивного состояния.');
+                    }
+
+                    return recommendations;
+                },
+
+                getRecommendedCourses() {
+                    const allRecommendations = [];
+
+                    // Collect all course recommendations from test results
+                    Object.entries(this.testResults).forEach(([testId, answer]) => {
+                        const testData = this.neuroTestData[testId][answer];
+                        if (testData.recommendations && testData.recommendations.length > 0) {
+                            testData.recommendations.forEach(rec => {
+                                if (!allRecommendations.includes(rec)) {
+                                    allRecommendations.push(rec);
+                                }
+                            });
+                        }
+                    });
+
+                    // If "Весь пакет курсов" is recommended, return all available courses
+                    if (allRecommendations.includes('Весь пакет курсов')) {
+                        return [
+                            'Нейрозарядка',
+                            'Красивая осанка',
+                            'Идеальные ягодицы',
+                            'Пресс и дыхание',
+                            'Добавь энергии',
+                            'Нейротренировки',
+                            'Точка зрения'
+                        ];
+                    }
+
+                    // Otherwise return the specific recommendations
+                    return allRecommendations.filter(rec => rec !== 'Весь пакет курсов');
+                },
+
+                getProgramRecommendation() {
+                    const { goal } = this.userData;
+                    const avgScore = this.calculateOverallScore();
+
+                    let programName = '';
+                    let programDesc = '';
+                    let programDuration = '';
+                    let programLevel = '';
+
+                    switch (goal) {
+                        case 'cognitive':
+                            programName = 'Нейротренировки';
+                            programDesc = 'Программа для улучшения когнитивных функций и работы мозга';
+                            break;
+                        case 'physical':
+                            programName = 'Физическая форма';
+                            programDesc = 'Комплексная программа для улучшения физической формы';
+                            break;
+                        case 'balance':
+                            programName = 'Баланс и координация';
+                            programDesc = 'Программа для развития равновесия и координации движений';
+                            break;
+                        case 'stress':
+                            programName = 'Антистресс';
+                            programDesc = 'Программа для снижения стресса и улучшения эмоционального состояния';
+                            break;
+                        case 'energy':
+                            programName = 'Энергия и активность';
+                            programDesc = 'Программа для повышения энергии и жизненного тонуса';
+                            break;
+                        default:
+                            programName = 'Комплексная программа';
+                            programDesc = 'Сбалансированная программа для общего развития';
+                    }
+
+                    // Determine program level based on experience and neurometrics
+                    if (this.userData.experience === 'beginner' || avgScore < 60) {
+                        programLevel = 'Начальный';
+                        programDuration = '4 недели';
+                    } else if (this.userData.experience === 'intermediate' || (avgScore >= 60 && avgScore < 80)) {
+                        programLevel = 'Средний';
+                        programDuration = '6 недель';
+                    } else {
+                        programLevel = 'Продвинутый';
+                        programDuration = '8 недель';
+                    }
+
+                    return {
+                        name: programName,
+                        description: programDesc,
+                        level: programLevel,
+                        duration: programDuration
+                    };
+                },
+
+                getCognitiveIntensity() {
+                    const { goal } = this.userData;
+                    return goal === 'cognitive' ? 5 :
+                           goal === 'physical' ? 2 :
+                           goal === 'balance' ? 3 :
+                           goal === 'stress' ? 4 : 3;
+                },
+
+                getPhysicalIntensity() {
+                    const { goal } = this.userData;
+                    return goal === 'cognitive' ? 2 :
+                           goal === 'physical' ? 5 :
+                           goal === 'balance' ? 4 :
+                           goal === 'stress' ? 2 : 4;
+                },
+
+                getDifficultyLevel() {
+                    const level = this.getProgramRecommendation().level;
+                    return level === 'Начальный' ? 2 :
+                           level === 'Средний' ? 3 : 5;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
