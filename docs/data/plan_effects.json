@@ -1,0 +1,201 @@
+[{
+  "exerciseEffects": {
+    "primaryEffects": {
+      "immediate": {
+        "neurological": {
+          "description": "string",
+          "measurableChanges": ["string"],
+          "timeToEffect": "string",
+          "duration": "string"
+        },
+        "physical": {
+          "description": "string",
+          "measurableChanges": ["string"],
+          "timeToEffect": "string",
+          "duration": "string"
+        }
+      },
+      "shortTerm": {
+        "adaptations": ["string"],
+        "expectedResults": ["string"],
+        "timeframe": "string"
+      },
+      "longTerm": {
+        "systemicChanges": ["string"],
+        "sustainableResults": ["string"],
+        "maintenanceRequirements": ["string"]
+      }
+    },
+    "secondaryEffects": {
+      "cognitive": {
+        "attention": {
+          "improvements": ["string"],
+          "dailyBenefits": ["string"]
+        },
+        "memory": {
+          "improvements": ["string"],
+          "dailyBenefits": ["string"]
+        }
+      },
+      "lifestyle": {
+        "energy": {
+          "improvements": ["string"],
+          "dailyBenefits": ["string"]
+        },
+        "stress": {
+          "improvements": ["string"],
+          "dailyBenefits": ["string"]
+        }
+      }
+    }
+  },
+  "userBenefits": {
+    "dailyLife": {
+      "work": {
+        "improvements": ["string"],
+        "examples": ["string"],
+        "timeToNotice": "string"
+      },
+      "home": {
+        "improvements": ["string"],
+        "examples": ["string"],
+        "timeToNotice": "string"
+      },
+      "social": {
+        "improvements": ["string"],
+        "examples": ["string"],
+        "timeToNotice": "string"
+      }
+    },
+    "progressionTimeline": {
+      "firstSession": {
+        "immediateEffects": ["string"],
+        "whatToExpect": ["string"]
+      },
+      "firstWeek": {
+        "changes": ["string"],
+        "measurableResults": ["string"]
+      },
+      "firstMonth": {
+        "adaptations": ["string"],
+        "lifeChanges": ["string"]
+      },
+      "threeMonths": {
+        "sustainableResults": ["string"],
+        "longTermBenefits": ["string"]
+      }
+    }
+  },
+  "effectProgression": {
+    "perSession": {
+      "beginning": {
+        "focus": "string",
+        "expectedChanges": ["string"]
+      },
+      "during": {
+        "adaptations": ["string"],
+        "signals": ["string"]
+      },
+      "end": {
+        "achievements": ["string"],
+        "nextSteps": ["string"]
+      }
+    },
+    "perWeek": {
+      "weeklyGoals": ["string"],
+      "progressionMarkers": ["string"],
+      "adaptationSigns": ["string"]
+    },
+    "perMonth": {
+      "monthlyMilestones": ["string"],
+      "sustainableChanges": ["string"],
+      "lifestyleImprovements": ["string"]
+    }
+  },
+  "realLifeApplications": {
+    "workEnvironment": {
+      "situations": ["string"],
+      "improvements": ["string"],
+      "examples": ["string"]
+    },
+    "dailyActivities": {
+      "situations": ["string"],
+      "improvements": ["string"],
+      "examples": ["string"]
+    },
+    "socialInteractions": {
+      "situations": ["string"],
+      "improvements": ["string"],
+      "examples": ["string"]
+    }
+  },
+  "measureableOutcomes": {
+    "objective": {
+      "metrics": ["string"],
+      "testResults": ["string"],
+      "physiologicalMarkers": ["string"]
+    },
+    "subjective": {
+      "selfAssessment": ["string"],
+      "feedbackPoints": ["string"],
+      "qualityOfLife": ["string"]
+    }
+  }
+  },
+  {
+    "exerciseEffects": {
+      "primaryEffects": {
+      "immediate": {
+        "neurological": {
+          "description": "Активация зрительной системы и вестибулярного аппарата",
+          "measurableChanges": [
+            "Улучшение фокусировки зрения",
+            "Повышение устойчивости",
+            "Снижение напряжения глазных мышц"
+          ],
+          "timeToEffect": "5-10 минут после начала упражнений",
+          "duration": "2-3 часа после тренировки"
+        },
+        "physical": {
+          "description": "Улучшение координации движений и баланса",
+          "measurableChanges": [
+            "Более точные движения",
+            "Лучший контроль положения тела",
+            "Повышение энергичности"
+          ],
+          "timeToEffect": "Во время выполнения упражнений",
+          "duration": "До конца дня"
+        }
+      }
+    }
+  },
+  "userBenefits": {
+    "dailyLife": {
+      "work": {
+        "improvements": [
+          "Меньше усталость при работе за компьютером",
+          "Лучше концентрация внимания",
+          "Более эффективная работа с документами"
+        ],
+        "examples": [
+          "Можете дольше работать без напряжения глаз",
+          "Лучше фокусируетесь на важных задачах",
+          "Меньше утомляемость к концу рабочего дня"
+        ],
+        "timeToNotice": "Первые улучшения заметны через 1-2 недели регулярных занятий"
+      }
+    }
+  },
+  "effectProgression": {
+    "perSession": {
+      "beginning": {
+        "focus": "Активация нервной системы и подготовка к нагрузкам",
+        "expectedChanges": [
+          "Повышение температуры тела",
+          "Улучшение кровообращения",
+          "Активация внимания"
+        ]
+      }
+    }
+  }
+}]

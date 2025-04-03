@@ -1,0 +1,380 @@
+# Neuronline Platform - User Flows & Use Cases
+
+## Primary User Flows
+
+### 1. New User Onboarding Flow
+
+```mermaid
+flowchart TD
+    Start([User Enters App]) --> A[Landing Page]
+    A --> B[Registration Form]
+    B --> C[Basic Profile Creation]
+    C --> D[Fitness Goals Selection]
+    D --> E[Equipment Availability Input]
+    E --> F[Training Days Preference]
+    F --> G[Neurotesting Assessment]
+    G --> H[Cognitive Profile Generation]
+    H --> I[AI Plan Generation]
+    I --> J[Personalized Plan Review]
+    J --> K[Plan Confirmation]
+    K --> L[Dashboard Overview]
+    L --> End([Onboarding Complete])
+```
+
+### 2. Daily Workout Execution Flow
+
+```mermaid
+flowchart TD
+    Start([User Opens App]) --> A[Dashboard]
+    A --> B[Today's Workout Card]
+    B --> C[Workout Details Screen]
+    C --> D[Warm-up Exercise Video]
+    D --> E[Main Workout Sequence]
+    E --> F{Exercise Complete?}
+    F -->|No| G[Continue Current Exercise]
+    F -->|Yes| H{More Exercises?}
+    H -->|Yes| I[Next Exercise]
+    I --> E
+    H -->|No| J[Cool-down Exercise]
+    J --> K[Workout Completion]
+    K --> L[Feedback Form]
+    L --> M[Results & Recommendations]
+    M --> End([Workout Complete])
+```
+
+### 3. Neurotesting Flow
+
+```mermaid
+flowchart TD
+    Start([User Selects Neurotest]) --> A[Neurotesting Introduction]
+    A --> B[Initial Instructions]
+    B --> C{Multiple Test Sequence}
+    C --> D[Visual Processing Test]
+    D --> E[Memory Test]
+    E --> F[Reaction Time Test]
+    F --> G[Cognitive Flexibility Test]
+    G --> H[Results Processing]
+    H --> I[Score Presentation]
+    I --> J[Detailed Breakdown]
+    J --> K[Recommendations]
+    K --> L[Save Results]
+    L --> M[Plan Adjustment Offer]
+    M --> End([Test Complete])
+```
+
+### 4. Progress Tracking Flow
+
+```mermaid
+flowchart TD
+    Start([User Opens Progress Tab]) --> A[Progress Dashboard]
+    A --> B[Progress Overview]
+    B --> C{View Options}
+    C --> D[Calendar View]
+    C --> E[Charts View]
+    C --> F[Achievements View]
+    D --> G[Day Details]
+    E --> H[Trend Analysis]
+    F --> I[Achievement Details]
+    G --> J[Historical Workout Data]
+    H --> K[Performance Insights]
+    I --> L[Unlocked vs. Locked]
+    J --> M[Export Options]
+    K --> M
+    L --> M
+    M --> End([Progress Review Complete])
+```
+
+### 5. Plan Adjustment Flow
+
+```mermaid
+flowchart TD
+    Start([Trigger: Progress/Feedback]) --> A[Current Plan Review]
+    A --> B[AI-Analysis of Performance]
+    B --> C[Generated Adjustments]
+    C --> D[User Review of Changes]
+    D --> E{Accept Changes?}
+    E -->|Yes| F[Plan Update]
+    E -->|No| G[Manual Modifications]
+    G --> H[Customization Options]
+    H --> F
+    F --> I[Schedule Recalculation]
+    I --> J[Notification of Changes]
+    J --> End([Plan Adjusted])
+```
+
+## Detailed Use Cases
+
+### UC-1: User Registration & Profile Creation
+
+**Primary Actor:** New User
+**Scope:** User Management System
+**Level:** User Goal
+**Stakeholders:** User, System Administrator
+
+**Preconditions:**
+- User has downloaded/accessed the application
+- User is not logged in
+
+**Main Success Scenario:**
+1. User opens application and selects "Register"
+2. System presents registration form requiring email, password, name
+3. User completes form and submits
+4. System validates input and creates account
+5. System prompts for basic physical metrics (age, gender, height, weight)
+6. User inputs physical metrics
+7. System prompts for fitness goals and preferences
+8. User selects primary and secondary fitness goals
+9. System prompts for available equipment
+10. User indicates available training equipment
+11. System prompts for preferred training days and times
+12. User selects preferred schedule
+13. System creates user profile and stores information
+14. System directs user to neurotesting module
+
+**Extensions:**
+- 4a. Invalid email format: System notifies user, returns to step 2
+- 4b. Email already registered: System notifies user, offers password recovery
+- 13a. Error in profile creation: System shows error message, allows retry
+
+**Frequency:** Continuous for new users
+
+### UC-2: Neurotesting and Cognitive Assessment
+
+**Primary Actor:** User
+**Scope:** Neurotesting System
+**Level:** User Goal
+**Stakeholders:** User, Fitness Trainers, System Administrators
+
+**Preconditions:**
+- User is registered and logged in
+- User profile contains basic information
+
+**Main Success Scenario:**
+1. User navigates to Neurotest section
+2. System presents neurotest introduction and purpose
+3. System guides user through test preparation steps
+4. User confirms readiness to start
+5. System presents visual processing test with instructions
+6. User completes visual processing test
+7. System presents memory test with instructions
+8. User completes memory test
+9. System presents reaction time test with instructions
+10. User completes reaction time test
+11. System presents cognitive flexibility test with instructions
+12. User completes cognitive flexibility test
+13. System processes all test results
+14. System displays comprehensive results with scores
+15. System provides score interpretation and recommendations
+16. System stores results in user profile
+17. System offers to update training plan based on results
+
+**Extensions:**
+- 6a, 8a, 10a, 12a. User struggles with test: System provides additional instructions
+- 6b, 8b, 10b, 12b. User abandons test: System saves partial results, allows resuming later
+- 13a. Processing error: System notifies user, suggests retrying specific test
+
+**Frequency:** Initial onboarding and periodic reassessment (every 4-8 weeks)
+
+### UC-3: AI-Generated Personalized Fitness Plan
+
+**Primary Actor:** User
+**Scope:** Plan Generation System
+**Level:** User Goal
+**Stakeholders:** User, Fitness Trainers, System Administrators
+
+**Preconditions:**
+- User profile is complete
+- Neurotesting results are available
+
+**Main Success Scenario:**
+1. System analyzes user profile data and neurotesting results
+2. System considers user's goals, limitations, and available equipment
+3. System generates personalized fitness plan with appropriate exercises
+4. System structures plan into weekly and daily workouts
+5. System calculates progressive difficulty adjustments
+6. System presents plan to user for review
+7. User reviews proposed plan
+8. User accepts fitness plan
+9. System finalizes and activates the plan
+10. System schedules notifications based on training days
+11. System presents dashboard with next scheduled workout
+
+**Extensions:**
+- 7a. User requests modifications: System presents customization options
+- 7b. User rejects plan: System offers alternative plan generation
+- 9a. System cannot create suitable plan: System notifies admin for manual intervention
+
+**Frequency:** Initial onboarding, after significant progress, or upon user request
+
+### UC-4: Daily Workout Execution
+
+**Primary Actor:** User
+**Scope:** Video Content Management, Progress Tracking
+**Level:** User Goal
+**Stakeholders:** User, Fitness Trainers
+
+**Preconditions:**
+- User has active fitness plan
+- Current day has scheduled workout
+
+**Main Success Scenario:**
+1. User logs into application
+2. System displays today's workout on dashboard
+3. User selects "Start Workout"
+4. System presents workout overview (exercises, duration, equipment needed)
+5. User confirms readiness
+6. System displays first exercise with video demonstration
+7. User watches video and performs exercise
+8. User marks exercise as complete
+9. System presents next exercise
+10. Steps 7-9 repeat until all exercises are complete
+11. System presents cool-down exercises
+12. User completes cool-down
+13. System presents workout summary
+14. System prompts for feedback on difficulty and experience
+15. User provides feedback
+16. System records workout completion and feedback
+17. System updates progress metrics
+18. System offers related content recommendations
+
+**Extensions:**
+- 5a. User lacks required equipment: System offers alternative exercises
+- 7a. Video playback issues: System provides text instructions as fallback
+- 7b. User needs to pause: System allows saving session state
+- 14a. User reports injury: System flags account for review, suggests recovery content
+
+**Frequency:** Multiple times per week according to plan
+
+### UC-5: Progress Tracking and Plan Adaptation
+
+**Primary Actor:** User
+**Scope:** Progress Tracking, Plan Generation
+**Level:** User Goal
+**Stakeholders:** User, Fitness Trainers
+
+**Preconditions:**
+- User has completed multiple workouts
+- Progress data is available
+
+**Main Success Scenario:**
+1. System continuously monitors user performance and completion rates
+2. System analyzes progress patterns over time
+3. System detects completion of significant milestone
+4. System evaluates user's improvement in physical and neural metrics
+5. System generates plan adaptations based on progress analysis
+6. System notifies user of suggested plan updates
+7. User reviews suggested adaptations
+8. User accepts adaptations
+9. System updates workout plan with new difficulty levels
+10. System recalculates schedule if needed
+11. System notifies user of updated plan
+12. User views updated plan
+
+**Extensions:**
+- 2a. Insufficient data: System waits for more workout completions
+- 4a. Regression detected: System suggests recovery-focused modifications
+- 7a. User rejects adaptations: System keeps current plan, reminds about adaptation later
+- 9a. User requests specific modifications: System incorporates user requests into adaptations
+
+**Frequency:** After completion of defined milestones (weekly/bi-weekly)
+
+### UC-6: Video Content Browsing and Execution
+
+**Primary Actor:** User
+**Scope:** Video Content Management
+**Level:** User Goal
+**Stakeholders:** User, Content Creators
+
+**Preconditions:**
+- User is logged in
+- Video content is available
+
+**Main Success Scenario:**
+1. User navigates to Videos section
+2. System presents categorized video library
+3. User selects category of interest
+4. System displays videos filtered by selected category
+5. User applies additional filters (duration, difficulty, trainer)
+6. System refines displayed videos based on filters
+7. User selects specific video
+8. System displays video details (description, duration, equipment, benefits)
+9. User starts video playback
+10. System streams video with adaptive quality
+11. User interacts with video (pause, resume, seek)
+12. User completes video
+13. System records completion in user history
+14. System suggests related videos
+15. User rates or favorites video (optional)
+16. System updates video popularity metrics
+
+**Extensions:**
+- 10a. Connectivity issues: System offers lower quality or offline playback
+- 11a. User exits before completion: System bookmarks position for later
+- 14a. No suitable recommendations: System suggests popular content
+
+**Frequency:** Daily or as needed by user
+
+### UC-7: Achievement and Rewards System
+
+**Primary Actor:** User
+**Scope:** Gamification System
+**Level:** Subfunction
+**Stakeholders:** User, Marketing Team
+
+**Preconditions:**
+- User is active on platform
+- Achievement system is configured
+
+**Main Success Scenario:**
+1. User completes action that triggers achievement criteria
+2. System evaluates achievement conditions
+3. System determines achievement is unlocked
+4. System creates achievement record in user profile
+5. System notifies user of new achievement
+6. System awards associated rewards (points, badges, features)
+7. User views achievement in profile
+8. System displays progress toward next-tier achievements
+9. User shares achievement on social media (optional)
+
+**Extensions:**
+- 3a. Achievement partially completed: System updates progress percentage
+- 6a. Reward includes premium feature: System activates feature access
+- 9a. Sharing declined: System offers alternative celebration animation
+
+**Frequency:** Ongoing throughout user interaction
+
+### UC-8: Managing Subscription and Settings
+
+**Primary Actor:** User
+**Scope:** User Management System
+**Level:** User Goal
+**Stakeholders:** User, Business Operations
+
+**Preconditions:**
+- User has active account
+- User is logged in
+
+**Main Success Scenario:**
+1. User navigates to Settings
+2. System displays current settings and subscription status
+3. User selects subscription management
+4. System displays subscription options and current plan
+5. User selects new subscription tier
+6. System processes payment information
+7. System updates subscription status
+8. System confirms successful subscription change
+9. User adjusts notification preferences
+10. System saves notification settings
+11. User configures display preferences (units, language, theme)
+12. System applies and saves preferences
+13. User reviews privacy settings
+14. System updates privacy preferences
+
+**Extensions:**
+- 6a. Payment processing error: System provides error details, suggests alternatives
+- 7a. Downgrade with feature loss: System warns about feature restrictions
+- 9a. Email notifications disabled: System warns about important updates
+
+**Frequency:** Occasionally as needed by user
+
+This detailed representation of user flows and use cases provides a comprehensive blueprint for implementing the Neuronline Platform, highlighting key interaction patterns, system responses, and potential variations in user journeys.

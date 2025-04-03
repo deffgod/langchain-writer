@@ -1,0 +1,87 @@
+{
+    "fitnessProgram": {
+      "weeklyPlans": [
+        {
+          "week": "number",
+          "timeline": [
+            {
+              "day": "number",
+              "wday_name": "string",
+              "theme": "string",
+              "workouts": [
+                {
+                  "type": "string",
+                  "name": "string",
+                  "duration": "string",
+                  "intensity": "string",
+                  "focus": "string",
+                  "equipment": ["string"],
+                  "effects": {
+                    "primary": {
+                      "mainSystem": {
+                        "effect": "string",
+                        "details": ["string"],
+                        "timeframe": {
+                          "immediate": "string",
+                          "shortTerm": "string",
+                          "longTerm": "string"
+                        }
+                      }
+                    },
+                    "secondary": {
+                      "additionalBenefits": {
+                        "effect": "string",
+                        "details": ["string"]
+                      }
+                    }
+                  },
+                  "userBenefits": {
+                    "dailyLife": {
+                      "category": ["string"]
+                    },
+                    "progressTimeline": {
+                      "firstWeek": "string",
+                      "firstMonth": "string",
+                      "threeMonths": "string"
+                    }
+                  },
+                  "practicalTips": ["string"]
+                }
+              ],
+              "monitoring": {
+                "pre_workout": ["string"],
+                "post_workout": ["string"]
+              }
+            }
+          ],
+          "weekly_focus": {
+            "primary": "string",
+            "secondary": "string",
+            "monitoring_emphasis": ["string"]
+          },
+          "recovery_protocols": {
+            "between_workouts": "string",
+            "recommended_sleep": "string",
+            "hydration": "string"
+          }
+        }
+      ],
+      "progression_metrics": {
+        "training_intensity": {
+          "weekN": "string"
+        },
+        "complexity": {
+          "weekN": "string"
+        },
+        "focus_areas": {
+          "area": "string"
+        }
+      },
+      "recommendations": {
+        "preparation": ["string"],
+        "recovery": ["string"],
+        "progression": ["string"]
+      }
+    }
+  }
+

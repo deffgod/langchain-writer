@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/><style>
+      @import url('https://fonts.googleapis.com/css2?family=San+Francisco:wght@400;600 &display=swap');
+      body {
+        background-color: #141414;
+        color: #FFFFFF;
+        font-family: 'San Francisco', Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 10px;
+      }
+
+.card {
+        background-color: #1C1C1E;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px;
+        width: 330px;
+        text-align: left;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        position: relative;
+        transition: transform 0.3s ease;
+      }
+
+.card-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        max-width: 1200px;
+        width: 100%;
+      }
+
+.card:hover {
+        transform: translateY(-10px);
+      }
+
+.card h2 {
+        color: #C6FF00;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+.card p,
+      .card ul {
+        color: #ffff;
+        margin-bottom: 15px;
+        font-size: 1rem;
+      }
+
+.card ul {
+        list-style: none;
+        color: #C6FF00;
+        padding: 0;
+      }
+
+.card ul li {
+        margin: 8px 0;
+        font-weight: 400;
+      }
+
+.card button {
+        background-color: #C6FF00;
+        border: none;
+        color: #000;
+        padding: 10px 19px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        position: absolute;
+        bottom: 15px;
+        right: 20px;
+      }
+
+.card button:hover {
+        background-color: #A3CC00;
+      }
+
+.card button:active {
+        background-color: #248A3A;
+      }
+
+.card small {
+        color: #999;
+        display: block;
+        margin-top: 5px;
+        font-size: 0.9rem;
+      }
+
+.card .icon {
+        width: 60px;
+        height: 60px;
+        background-color: #C6FF00;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #141414;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card-container">
+      <div class="card">
+        <div class="icon">1</div>
+        <h2>Понедельник (2024-07-15)</h2>
+        <p>
+          <strong>Тема:</strong>
+          Энергия и активация мозга</p>
+        <ul>
+          <li>Бодрость: Артикуляция позвоночника</li>
+          <li>Силовая тренировка на пресс</li>
+          <li>Спокойное дыхание</li>
+        </ul>
+        <p>
+          <strong>Советы:</strong>
+          Разминка перед тренировкой помогает предотвратить травмы. Не забывайте делать растяжку после тренировки.
+        </p>
+        <button>Старт</button>
+        <small>May 24, 2024</small>
+      </div>
+      <div class="card">
+        <div class="icon">2</div>
+        <h2>Вторник (2024-07-16)</h2>
+        <p>
+          <strong>Тема:</strong>
+          Выходной</p>
+        <p>
+          <strong>Советы:</strong>
+          Отдых важен для восстановления мышц и улучшения общего состояния. Принимайте достаточно воды в течение дня.
+        </p>
+        <button>Старт</button>
+        <small>May 24, 2024</small>
+      </div>
+      <div class="card">
+        <div class="icon">3</div>
+        <h2>Среда (2024-07-17)</h2>
+        <p>
+          <strong>Тема:</strong>
+          Фокус на зрении</p>
+        <ul>
+          <li>Точка зрения: Зарядка для глаз</li>
+          <li>Координационная тренировка на ягодицы</li>
+          <li>Работа с блуждающим нервом</li>
+        </ul>
+        <p>
+          <strong>Советы:</strong>
+          Сосредоточьтесь на упражнениях для улучшения зрения. Выполняйте их регулярно для лучшего эффекта.
+        </p>
+        <button>Старт</button>
+        <small>May 24, 2024</small>
+      </div>
+      <div class="card">
+        <div class="icon">4</div>
+        <h2>Четверг (2024-07-18)</h2>
+        <p>
+          <strong>Тема:</strong>
+          Выходной</p>
+        <p>
+          <strong>Советы:</strong>
+          Используйте этот день для расслабления и восстановления. Не пренебрегайте активным отдыхом, таким как прогулки на свежем воздухе.
+        </p>
+        <button>Старт</button>
+        <small>May 24, 2024</small>
+      </div>
+      <div class="card">
+        <div class="icon">5</div>
+        <h2>Пятница (2024-07-19)</h2>
+        <p>
+          <strong>Тема:</strong>
+          Выходной</p>
+        <p>
+          <strong>Советы:</strong>
+          Позвольте своему телу расслабиться и подготовиться к предстоящим тренировкам. Попробуйте медитацию для успокоения ума.
+        </p>
+        <button>Старт</button>
+        <small>May 24, 2024</small>
+      </div>
+      <div class="card">
+        <div class="icon">6</div>
+        <h2>Суббота (2024-07-20)</h2>
+        <p>
+          <strong>Тема:</strong>
+          Улучшение координации</p>
+        <ul>
+          <li>Бодрость</li>
+          <li>Плиометрика</li>
+          <li>Спокойствие: Спокойное дыхание</li>
+        </ul>
+        <p>
+          <strong>Советы:</strong>
+          Направляя внимание на координацию, выполняйте движения медленно и точно, чтобы избежать травм.
+        </p>
+        <button>Старт</button>
+        <small>May 24, 2024</small>
+      </div>
+      <div class="card">
+        <div class="icon">7</div>
+        <h2>Воскресенье (2024-07-21)</h2>
+        <p>
+          <strong>Тема:</strong>
+          Успокоить и восстановить силы</p>
+        <ul>
+          <li>Энергия утра</li>
+          <li>Комплекс на все тело</li>
+          <li>Расслабление мышц</li>
+        </ul>
+        <p>
+          <strong>Советы:</strong>
+          Этот день направлен на восстановление. Практикуйте дыхательные упражнения для снятия стресса.
+        </p>
+        <button>Старт</button>
+        <small>May 24, 2024</small>
+      </div>
+    </div>
+  </body>
+</html>

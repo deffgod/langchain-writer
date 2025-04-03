@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нейрофитнес Чат</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+   <style>
+    :root {
+        --primary-color: #007AFF;
+        --incoming-bg: rgba(180, 255, 0, 0.1);
+        --outgoing-bg: #007AFF;
+        --text-light: #ffffff;
+        --text-dark: #000000;
+        --system-background: #ffffff;
+        --input-background: #f2f2f7;
+        --sidebar-width: 320px;
+        --neon-green: #b4ff00;
+        --text-secondary: #86868b;
+        --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        --header-height: 70px;
+        --border-radius: 16px;
+        --error-color: #ff3b30;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--system-background);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+    }
+
+    .chat-container {
+        display: flex;
+        height: calc(100vh - var(--header-height));
+        margin-top: var(--header-height);
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar {
+        width: var(--sidebar-width);
+        background: var(--input-background);
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        box-shadow: var(--card-shadow);
+    }
+
+    .sidebar-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--system-background);
+    }
+
+    .sidebar-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .results-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.25rem;
+        scroll-behavior: smooth;
+    }
+
+    .test-result-item {
+        background: var(--system-background);
+        border-radius: var(--border-radius);
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .test-result-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .test-result-item h3 {
+        margin: 0 0 0.75rem;
+        font-size: 1.1rem;
+        color: var(--neon-green);
+        font-weight: 600;
+    }
+
+    .result-details {
+        font-size: 0.95rem;
+    }
+
+    .result-choice {
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        color: var(--text-dark);
+        padding: 0.5rem;
+        background: var(--incoming-bg);
+        border-radius: 8px;
+    }
+
+    .result-interpretation {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .recommendations {
+        background: rgba(180, 255, 0, 0.05);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-top: 1rem;
+    }
+
+    .recommendations h4 {
+        font-size: 1rem;
+        margin: 0 0 0.75rem;
+        color: var(--neon-green);
+        font-weight: 600;
+    }
+
+    .recommendations ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+    }
+
+    .recommendations li {
+        margin-bottom: 0.5rem;
+    }
+
+    .main-chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: var(--system-background);
+        position: relative;
+    }
+
+    #message-viewer {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        scroll-behavior: smooth;
+    }
+
+    .message {
+        max-width: 75%;
+        padding: 1rem 1.25rem;
+        border-radius: var(--border-radius);
+        margin: 0.25rem 0;
+        font-size: 1rem;
+        line-height: 1.5;
+        position: relative;
+        transition: transform 0.2s ease;
+    }
+
+    .message.incoming {
+        align-self: flex-start;
+        background-color: var(--incoming-bg);
+        color: var(--text-dark);
+        border-bottom-left-radius: 4px;
+        animation: slideFromLeft 0.3s ease-out;
+    }
+
+    .message.outgoing {
+        align-self: flex-end;
+        background-color: var(--outgoing-bg);
+        color: var(--text-light);
+        border-bottom-right-radius: 4px;
+        animation: slideFromRight 0.3s ease-out;
+    }
+
+    .message:hover {
+        transform: translateY(-1px);
+    }
+
+    .message-input-container {
+        padding: 1.25rem;
+        background-color: var(--system-background);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        position: relative;
+    }
+
+    .message-input {
+        flex: 1;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--input-background);
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        resize: none;
+        max-height: 150px;
+        min-height: 24px;
+        transition: all 0.2s ease;
+        line-height: 1.5;
+    }
+
+    .message-input:focus {
+        outline: none;
+        border-color: var(--neon-green);
+        box-shadow: 0 0 0 2px rgba(180, 255, 0, 0.2);
+    }
+
+    .send-button {
+        background: var(--neon-green);
+        color: var(--text-dark);
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .send-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(180, 255, 0, 0.3);
+    }
+
+    .send-button:active {
+        transform: translateY(0);
+    }
+
+    .chat-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-height);
+        background: var(--system-background);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        z-index: 100;
+        box-shadow: var(--card-shadow);
+    }
+
+    .chat-header h1 {
+        font-size: 1.4rem;
+        margin: 0;
+        font-weight: 600;
+        background: linear-gradient(45deg, var(--text-dark), var(--neon-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .user-goals {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .test-score {
+        background: var(--neon-green);
+        color: var(--text-dark);
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-size: 0.95rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .score-label {
+        opacity: 0.8;
+    }
+
+    .score-value {
+        font-size: 1.1rem;
+    }
+
+    @keyframes slideFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideFromRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        :root {
+            --sidebar-width: 100%;
+            --header-height: 60px;
+        }
+
+        .chat-container {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            height: 50vh;
+            border-right: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .main-chat {
+            height: 50vh;
+        }
+
+        .chat-header {
+            padding: 0 1rem;
+        }
+
+        .chat-header h1 {
+            font-size: 1.2rem;
+        }
+
+        .user-profile {
+            gap: 1rem;
+        }
+
+        .test-score {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .message {
+            max-width: 85%;
+        }
+
+        .message-input-container {
+            padding: 1rem;
+        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --system-background: #000000;
+            --input-background: #1c1c1e;
+            --incoming-bg: rgba(180, 255, 0, 0.15);
+            --text-light: #ffffff;
+            --text-dark: #ffffff;
+            --text-secondary: #98989d;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-result-item {
+            background: #1c1c1e;
+        }
+
+        .message-input-container {
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .message-input {
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .send-button {
+            background: var(--neon-green);
+            color: var(--text-dark);
+        }
+
+        .recommendations {
+            background: rgba(180, 255, 0, 0.1);
+        }
+    }
+
+    .message.sending {
+        opacity: 0.7;
+        position: relative;
+    }
+
+    .message.sending::after {
+        content: '';
+        position: absolute;
+        right: -24px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--neon-green);
+        border-radius: 50%;
+        border-right-color: transparent;
+        animation: rotate 0.8s linear infinite;
+    }
+
+    .message.received {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .message.error {
+        border: 1px solid var(--error-color);
+        background-color: rgba(255, 59, 48, 0.1);
+        color: var(--error-color);
+    }
+
+    @keyframes rotate {
+        from { transform: translateY(-50%) rotate(0deg); }
+        to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+</style>
+</head>
+<body>
+    <div class="chat-header">
+        <h1>Персональный Нейрофитнес Ассистент</h1>
+        <div id="user-profile" class="user-profile">
+            <div class="user-info"></div>
+            <div class="test-results-summary"></div>
+        </div>
+    </div>
+
+    <audio id="notification-sound" src="chat/content/notification.mp3" preload="auto"></audio>
+    <div class="chat-container">
+        <div class="sidebar" id="test-results-sidebar">
+            <div class="sidebar-header">
+                <h2>Результаты тестирования</h2>
+            </div>
+            <div class="results-content"></div>
+        </div>
+
+        <div class="main-chat">
+            <div id="message-viewer"></div>
+            <div class="message-input-container">
+                <textarea class="message-input" id="message-input" placeholder="Напишите свое сообщение..."></textarea>
+                <button class="send-button" id="send-button">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js">document.addEventListener('DOMContentLoaded', () => {
+        const messageViewer = document.getElementById('message-viewer');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const notificationSound = document.getElementById('notification-sound');
+
+        // Secure API Configuration
+        const API_ENDPOINT = 'https://api.writer.com/v1/chat';
+        const WRITER_API_KEY = 'nwZaL9AZuznzxJgMdGRnql1mGLiCdjXZE1vQakGs33U';
+
+        // API Request Configuration
+        const API_CONFIG = {
+            model: 'palmyra-x-004',
+            temperature: 0.7,
+            max_tokens: 2000,
+            stream: true,
+            constraints: {
+                language: 'ru',
+                style: 'professional_friendly',
+                require_breadcrumb: true,
+                authorized_exercises_only: true
+            }
+        };
+
+        // Conversation Management
+        const ConversationManager = {
+            stages: [
+                {
+                    stage: 'introduction',
+                    initialMessage: 'Здравствуйте! Я - ваш персональный ассистент по нейрофитнесу. Прежде чем мы начнем, могу я узнать, как к вам обращаться?',
+                    processResponse(response) {
+                        UserSession.name = response;
+                        if (UserSession.testResults) {
+                            return `Отлично, ${response}! Я вижу, что вы уже прошли нейротестирование. Ваш общий результат: ${UserSession.testResults.overallScore}%. Давайте обсудим ваши результаты и составим план трениров��к. Что вас интересует больше всего?`;
+                        }
+                        return `Отлично, ${response}! Давайте начнем с определения ваших целей в нейрофитнесе. Расскажите, пожалуйста, какие у вас приоритеты:\n\n1. Улучшение работы мозга\n2. Снижение стресса\n3. Повышение энергичности\n4. Улучшение координации\n5. Другие цели\n\n[Текущий шаг: 1/5 - Сбор контекста]`;
+                    }
+                },
+                {
+                    stage: 'test_offer',
+                    processResponse(response) {
+                        if (response.toLowerCase().includes('да')) {
+                            window.location.href = 'timelinecards.html';
+                            return null;
+                        }
+                        UserSession.goals = ['Общее улучшение'];
+                        return `Хорошо, тогда давайте начнем с базовых упражнений. Как часто вы готовы заниматься?`;
+                    }
+                },
+                {
+                    stage: 'goals',
+                    processResponse(response) {
+                        UserSession.goals = response.split(',').map(goal => goal.trim());
+                        return `Спасибо, ${UserSession.name}! Ваши цели – ${UserSession.goals.join(' и ')} – это отличный выбор. Давайте определим, как часто вы готовы заниматься:\n\n1. Ежедневно, 10-15 минут\n2. 3-4 раза в неделю, 20-30 минут\n3. 2 раза в неделю, 45-60 минут\n4. Другой график\n\n[Текущий шаг: 2/5 - Определение графика тренировок]`;
+                    }
+                },
+                {
+                    stage: 'frequency',
+                    processResponse(response) {
+                        UserSession.trainingFrequency = response;
+                        return `Отлично! Теперь давайте оценим ваш текущий уровень подготовки. Вам комфортнее заниматься:\n\n1. Дома\n2. В спортзале\n3. На улице\n4. Смешанный формат\n\n[Текущий шаг: 3/5 - Выбор формата тренировок]`;
+                    }
+                }
+            ],
+            currentStage: 0
+        };
+
+        // User Session Management
+        const UserSession = {
+            name: '',
+            goals: [],
+            trainingFrequency: null,
+            conversationStage: 0,
+            testResults: null,
+
+            saveSession() {
+                localStorage.setItem('neurofitness_user', JSON.stringify({
+                    name: this.name,
+                    goals: this.goals,
+                    trainingFrequency: this.trainingFrequency,
+                    testResults: this.testResults
+                }));
+            },
+
+            loadSession() {
+                const savedSession = localStorage.getItem('neurofitness_user');
+                if (savedSession) {
+                    const parsedSession = JSON.parse(savedSession);
+                    Object.assign(this, parsedSession);
+                }
+            },
+
+            saveTestResults(results) {
+                this.testResults = results;
+                this.saveSession();
+            }
+        };
+
+        // Conversation History Management
+        let conversationHistory = [
+            {
+                "role": "system",
+                "content": "You are an AI assistant specializing in neurofitness, helping individuals optimize their mental and physical well-being through structured, personalized training programs. You must communicate in Russian, be polite, and address clients by name. Use only exercises from the authorized database."
+            }
+        ];
+
+        // Utility Functions
+        function addMessage(text, isOutgoing = true) {
+            if (!messageViewer) {
+                console.error('Message viewer element not found');
+                return null;
+            }
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isOutgoing ? 'outgoing' : 'incoming');
+            messageElement.textContent = text;
+
+            messageViewer.appendChild(messageElement);
+            messageViewer.scrollTop = messageViewer.scrollHeight;
+
+            if (!isOutgoing) {
+                notificationSound?.play().catch(() => {});
+            }
+
+            // Animation
+            messageElement.style.opacity = '0';
+            messageElement.style.transform = 'translateY(10px)';
+            requestAnimationFrame(() => {
+                messageElement.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                messageElement.style.opacity = '1';
+                messageElement.style.transform = 'translateY(0)';
+            });
+
+            return messageElement;
+        }
+
+        // API Interaction
+        async function sendMessageToAPI(messages) {
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${WRITER_API_KEY}`,
+                        'User-Agent': 'HTTPBot/2024.1.4',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        model: API_CONFIG.model,
+                        messages: messages,
+                        stream: API_CONFIG.stream,
+                        temperature: API_CONFIG.temperature,
+                        max_tokens: API_CONFIG.max_tokens,
+                        available_functions: {
+                            get_exercises: {
+                                categories: [
+                                    "Нейрозарядка",
+                                    "Нейротренировки",
+                                    "Добавь энергии"
+                                ],
+                                exercises_database: "Categories.json"
+                            }
+                        },
+                        constraints: API_CONFIG.constraints
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    console.error('API Error:', errorData);
+                    throw new Error(`API request failed: ${errorData.message || response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('API Error:', error);
+                if (error.message.includes('Failed to fetch')) {
+                    throw new Error('Ошибка подключения к серверу. Пожалуйста, попробуйте позже.');
+                }
+                throw error;
+            }
+        }
+
+        // Message Processing Logic
+        async function processMessage(userInput) {
+            const currentStage = ConversationManager.stages[ConversationManager.currentStage];
+
+            // Add user message to conversation
+            conversationHistory.push({
+                role: "user",
+                content: userInput
+            });
+
+            // Process stage-specific logic
+            const stageResponse = currentStage.processResponse(userInput);
+
+            // Update UI with loading state
+            const messageElement = addMessage(userInput, true);
+            if (!messageElement) {
+                console.error('Failed to create message element');
+                return;
+            }
+
+            messageElement.classList.add('sending');
+
+            try {
+                // Send to API
+                const aiResponse = await sendMessageToAPI(conversationHistory);
+
+                // Add AI response to conversation
+                conversationHistory.push({
+                    role: "assistant",
+                    content: aiResponse
+                });
+
+                // Update UI with response
+                const responseElement = addMessage(aiResponse, false);
+                if (responseElement) {
+                    responseElement.classList.add('received');
+                }
+
+                // Move to next stage if appropriate
+                if (stageResponse !== null) {
+                    ConversationManager.currentStage++;
+
+                    // Save session progress
+                    UserSession.conversationStage = ConversationManager.currentStage;
+                    UserSession.saveSession();
+                }
+            } catch (error) {
+                console.error('Error processing message:', error);
+                if (messageElement) {
+                    messageElement.classList.add('error');
+                }
+                const errorElement = addMessage('Извините, произошла ошибка. Попробуйте позже.', false);
+                if (errorElement) {
+                    errorElement.classList.add('error');
+                }
+            } finally {
+                if (messageElement) {
+                    messageElement.classList.remove('sending');
+                }
+            }
+        }
+
+        // Event Listeners
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const userInput = messageInput.value.trim();
+                if (userInput) {
+                    processMessage(userInput);
+                    messageInput.value = '';
+                }
+            }
+        });
+
+        sendButton.addEventListener('click', () => {
+            const userInput = messageInput.value.trim();
+            if (userInput) {
+                processMessage(userInput);
+                messageInput.value = '';
+            }
+        });
+
+        // Initial Setup
+        UserSession.loadSession();
+
+        // Start Conversation
+        setTimeout(() => {
+            addMessage(ConversationManager.stages[0].initialMessage, false);
+        }, 500);
+    })</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userProfileElement = document.querySelector('.user-info');
+            const testResultsSummary = document.querySelector('.test-results-summary');
+            const resultsContent = document.querySelector('.results-content');
+            const savedUserData = localStorage.getItem('neurofitness_user');
+
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+
+                // Update user profile
+                userProfileElement.innerHTML = `
+                    <span class="user-name">👤 ${userData.name}</span>
+                    ${userData.goals.length > 0 ? `<span class="user-goals">🎯 Цели: ${userData.goals.join(', ')}</span>` : ''}
+                `;
+
+                // Display test results if available
+                if (userData.testResults) {
+                    testResultsSummary.innerHTML = `
+                        <div class="test-score">
+                            <span class="score-label">Общий результат:</span>
+                            <span class="score-value">${userData.testResults.overallScore}%</span>
+                        </div>
+                    `;
+
+                    // Populate sidebar with detailed results
+                    resultsContent.innerHTML = userData.testResults.testResults.map(test => `
+                        <div class="test-result-item">
+                            <h3>${test.question}</h3>
+                            ${test.result ? `
+                                <div class="result-details">
+                                    <p class="result-choice">${test.result.choice}</p>
+                                    <p class="result-interpretation">${test.result.interpretation?.text || ''}</p>
+                                    ${test.result.interpretation?.recommendations?.length ? `
+                                        <div class="recommendations">
+                                            <h4>Рекомендации:</h4>
+                                            <ul>
+                                                ${test.result.interpretation.recommendations.map(rec => `
+                                                    <li>${rec}</li>
+                                                `).join('')}
+                                            </ul>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
